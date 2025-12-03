@@ -3,6 +3,8 @@
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
+// 1. On ajoute l'import pour gérer la déconnexion
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 
 Route::middleware('guest')->group(function () {
     Volt::route('register', 'pages.auth.register')
@@ -28,4 +30,8 @@ Route::middleware('auth')->group(function () {
 
     Volt::route('confirm-password', 'pages.auth.confirm-password')
         ->name('password.confirm');
+
+    // 2. C'est ici qu'il manquait la route LOGOUT
+    Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
+        ->name('logout');
 });
