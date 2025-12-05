@@ -35,9 +35,11 @@
             </a>
 
             <!-- Publications (Dropdown) -->
-            <div x-data="{ open: {{ request()->routeIs('admin.articles.*') || request()->routeIs('admin.categories.*') ? 'true' : 'false' }} }">
+            <!-- Note: J'ai ajouté admin.documents.* à la condition d'ouverture -->
+            <div x-data="{ open: {{ request()->routeIs('admin.articles.*') || request()->routeIs('admin.categories.*') || request()->routeIs('admin.documents.*') ? 'true' : 'false' }} }">
                 <button @click="if(sidebarExpanded) open = !open" 
-                        class="w-full group flex items-center justify-between rounded-xl px-3 py-2.5 font-medium transition-all text-gray-400 hover:bg-white/5 hover:text-white">
+                        class="w-full group flex items-center justify-between rounded-xl px-3 py-2.5 font-medium transition-all text-gray-400 hover:bg-white/5 hover:text-white"
+                        :class="open ? 'text-white' : ''">
                     <div class="flex items-center gap-3">
                         <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" /></svg>
                         <span x-show="sidebarExpanded" class="whitespace-nowrap">Publications</span>
@@ -46,8 +48,23 @@
                 </button>
                 
                 <div x-show="open && sidebarExpanded" x-collapse class="space-y-1 pl-10 mt-1">
-                    <a href="{{ route('admin.articles.index') }}" wire:navigate class="block py-2 text-sm text-gray-400 hover:text-kamina-gold transition">Tous les articles</a>
-                    <a href="{{ route('admin.categories.index') }}" wire:navigate class="block py-2 text-sm text-gray-400 hover:text-kamina-gold transition">Catégories</a>
+                    
+                    <a href="{{ route('admin.articles.index') }}" wire:navigate 
+                       class="block py-2 text-sm transition {{ request()->routeIs('admin.articles.*') ? 'text-kamina-gold font-medium' : 'text-gray-400 hover:text-white' }}">
+                       Tous les articles
+                    </a>
+                    
+                    <a href="{{ route('admin.categories.index') }}" wire:navigate 
+                       class="block py-2 text-sm transition {{ request()->routeIs('admin.categories.*') ? 'text-kamina-gold font-medium' : 'text-gray-400 hover:text-white' }}">
+                       Catégories
+                    </a>
+
+                    <!-- AJOUT DU LIEN DOCUMENTS -->
+                    <a href="{{ route('admin.documents.index') }}" wire:navigate 
+                       class="block py-2 text-sm transition {{ request()->routeIs('admin.documents.*') ? 'text-kamina-gold font-medium' : 'text-gray-400 hover:text-white' }}">
+                       Documents Officiels
+                    </a>
+
                 </div>
             </div>
 
@@ -58,7 +75,7 @@
                     Administration
                 </h3>
                 <a href="{{ route('admin.users.index') }}" wire:navigate
-                   class="group flex items-center gap-3 rounded-xl px-3 py-2.5 font-medium transition-all text-gray-400 hover:bg-white/5 hover:text-white">
+                   class="group flex items-center gap-3 rounded-xl px-3 py-2.5 font-medium transition-all duration-200 {{ request()->routeIs('admin.users.*') ? 'bg-white/10 text-white shadow-lg' : 'text-gray-400 hover:bg-white/5 hover:text-white' }}">
                     <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
                     <span x-show="sidebarExpanded" class="whitespace-nowrap">Utilisateurs</span>
                 </a>
@@ -70,13 +87,13 @@
 
     <!-- PROFIL -->
     <div class="p-4 border-t border-gray-800" x-show="sidebarExpanded">
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3 cursor-pointer hover:bg-white/5 p-2 rounded-lg transition">
             <div class="h-9 w-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold shadow">
                 {{ substr(auth()->user()->name, 0, 1) }}
             </div>
             <div class="overflow-hidden">
                 <p class="text-sm font-medium text-white truncate">{{ auth()->user()->name }}</p>
-                <p class="text-xs text-gray-400 truncate">{{ auth()->user()->role }}</p>
+                <p class="text-xs text-gray-400 truncate capitalize">{{ auth()->user()->role }}</p>
             </div>
         </div>
     </div>

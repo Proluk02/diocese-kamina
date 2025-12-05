@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
+use App\Livewire\Admin\Articles\ArticleIndex;
+use App\Livewire\Admin\Categories\CategoryIndex;
+use App\Livewire\Admin\Documents\DocumentIndex;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,6 +47,10 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::get('/settings', function () {
         return view('dashboard'); // Temporaire
     })->name('settings.index');
+
+    Route::get('/articles', ArticleIndex::class)->name('articles.index');
+    Route::get('/categories', CategoryIndex::class)->name('categories.index');
+    Route::get('/documents', DocumentIndex::class)->name('documents.index');
 });
 
 // --- GESTION DU PROFIL ---
