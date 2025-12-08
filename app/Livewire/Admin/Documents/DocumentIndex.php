@@ -5,7 +5,7 @@ namespace App\Livewire\Admin\Documents;
 use App\Models\Document;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Livewire\WithFileUploads; // Indispensable pour les fichiers
+use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 
@@ -13,55 +13,51 @@ class DocumentIndex extends Component
 {
     use WithPagination, WithFileUploads;
 
-    // Filtres
     public $search = '';
     public $filterType = '';
-
-    // Modale
     public $isOpen = false;
-    public $isEdit = false;
+    public $mode = 'create'; 
 
-    // Champs
     public $docId;
     public $title;
-    public $description;
-    public $type = 'homelie'; // homelie, lettre, communique, autre
-    public $file; // Le fichier temporaire uploadé
-    public $oldFile; // Le chemin du fichier existant (pour l'édition)
+    
+    // IMPORTANT : Initialisation explicite à null
+    public $description = null;
+    
+    public $type = 'homelie';
+    public $video_link;
+    public $file;
+    public $oldFile;
     public $is_downloadable = true;
+    public $currentDoc;
 
-    // Types de documents pour le select
     public $types = [
         'homelie' => 'Homélie',
         'lettre' => 'Lettre Pastorale',
-        'communique' => 'Communiqué Officiel',
-        'rapport' => 'Rapport / Compte-rendu',
-        'autre' => 'Autre document'
+        'communique' => 'Communiqué',
+        'rapport' => 'Rapport',
+        'autre' => 'Autre'
     ];
 
     protected function rules()
     {
-        $rules = [
+        return [
             'title' => 'required|min:3',
             'type' => 'required|in:homelie,lettre,communique,rapport,autre',
-            'description' => 'nullable|string',
+            'description' => 'nullable|string', // Nullable autorisé
+            'video_link' => 'nullable|url',
             'is_downloadable' => 'boolean',
+            'file' => 'nullable|mimes:pdf|max:10240',
         ];
-
-        // Le fichier est obligatoire seulement à la création
-        if (!$this->isEdit) {
-            $rules['file'] = 'required|mimes:pdf|max:10240'; // PDF max 10MB
-        } else {
-            $rules['file'] = 'nullable|mimes:pdf|max:10240';
-        }
-
-        return $rules;
     }
+
+    public function updatedSearch() { $this->resetPage(); }
 
     public function create()
     {
         $this->resetInputFields();
-        $this->openModal();
+        $this->mode = 'create';
+        $this->isOpen = true;
     }
 
     public function edit($id)
@@ -69,13 +65,38 @@ class DocumentIndex extends Component
         $doc = Document::findOrFail($id);
         $this->docId = $id;
         $this->title = $doc->title;
-        $this->description = $doc->description;
+        
+        // On récupère la description (si null, reste null)
+        $this->description = $doc->description; 
+        
         $this->type = $doc->type;
+        $this->video_link = $doc->video_link;
         $this->is_downloadable = (bool) $doc->is_downloadable;
         $this->oldFile = $doc->file_path;
         
-        $this->isEdit = true;
-        $this->openModal();
+        $this->mode = 'edit';
+        $this->isOpen = true;
+    }
+
+    public function show($id)
+    {
+        $this->currentDoc = Document::findOrFail($id);
+        $this->mode = 'show';
+        $this->isOpen = true;
+    }
+
+    public function closeModal()
+    {
+        $this->isOpen = false;
+        $this->resetInputFields();
+    }
+
+    private function resetInputFields()
+    {
+        $this->reset(['title', 'type', 'video_link', 'file', 'oldFile', 'docId', 'currentDoc']);
+        $this->description = null; // Reset propre
+        $this->is_downloadable = true;
+        $this->resetErrorBag();
     }
 
     public function save()
@@ -84,28 +105,26 @@ class DocumentIndex extends Component
 
         $data = [
             'title' => $this->title,
-            'description' => $this->description,
+            'description' => $this->description, // Sera null ou une string HTML
             'type' => $this->type,
+            'video_link' => $this->video_link,
             'is_downloadable' => $this->is_downloadable,
             'user_id' => Auth::id(),
         ];
 
-        // Gestion du fichier
         if ($this->file) {
-            // Si on édite et qu'il y a déjà un fichier, on le supprime
-            if ($this->isEdit && $this->oldFile) {
+            if ($this->mode === 'edit' && $this->oldFile) {
                 Storage::disk('public')->delete($this->oldFile);
             }
-            // Sauvegarde du nouveau (dans le dossier 'documents')
             $data['file_path'] = $this->file->store('documents', 'public');
         }
 
-        if ($this->isEdit) {
+        if ($this->mode === 'edit') {
             Document::find($this->docId)->update($data);
             session()->flash('success', 'Document mis à jour.');
         } else {
             Document::create($data);
-            session()->flash('success', 'Document ajouté avec succès.');
+            session()->flash('success', 'Document ajouté.');
         }
 
         $this->closeModal();
@@ -114,29 +133,18 @@ class DocumentIndex extends Component
     public function delete($id)
     {
         $doc = Document::findOrFail($id);
-        
-        // Supprimer le fichier physique
-        if ($doc->file_path) {
-            Storage::disk('public')->delete($doc->file_path);
-        }
-        
+        if ($doc->file_path) Storage::disk('public')->delete($doc->file_path);
         $doc->delete();
-        session()->flash('success', 'Document supprimé définitivement.');
+        session()->flash('success', 'Supprimé.');
+        if($this->isOpen) $this->closeModal();
     }
 
-    public function openModal() { $this->isOpen = true; }
-    
-    public function closeModal() 
-    { 
-        $this->isOpen = false; 
-        $this->resetInputFields();
-    }
-
-    private function resetInputFields()
+    public function getYoutubeEmbedUrl($url)
     {
-        $this->reset(['title', 'description', 'type', 'file', 'oldFile', 'docId', 'isEdit']);
-        $this->is_downloadable = true;
-        $this->resetErrorBag();
+        if (preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i', $url, $matches)) {
+            return 'https://www.youtube.com/embed/' . $matches[1];
+        }
+        return null;
     }
 
     public function render()

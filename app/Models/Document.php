@@ -11,22 +11,18 @@ class Document extends Model
     use HasFactory;
 
     protected $fillable = [
-        'title',
-        'description',
-        'file_path',
-        'type',             // homelie, lettre, communique
-        'is_downloadable',
-        'user_id',
-    ];
+    'title',
+    'type',
+    'file_path',
+    'is_downloadable',
+    'user_id',
+    'description', // <--- CELLE-CI DOIT ÊTRE LÀ
+    'video_link',  // <--- CELLE-CI AUSSI
+];
 
     protected $casts = [
         'is_downloadable' => 'boolean',
     ];
-
-    /* -----------------------------------------------------------------
-     |  RELATIONS
-     | -----------------------------------------------------------------
-     */
 
     public function user(): BelongsTo
     {

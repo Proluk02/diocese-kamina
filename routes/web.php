@@ -5,6 +5,7 @@ use App\Http\Controllers\ProfileController;
 use App\Livewire\Admin\Articles\ArticleIndex;
 use App\Livewire\Admin\Categories\CategoryIndex;
 use App\Livewire\Admin\Documents\DocumentIndex;
+use App\Livewire\Admin\Parishes\ParishIndex;
 
 /*
 |--------------------------------------------------------------------------
@@ -51,6 +52,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::get('/articles', ArticleIndex::class)->name('articles.index');
     Route::get('/categories', CategoryIndex::class)->name('categories.index');
     Route::get('/documents', DocumentIndex::class)->name('documents.index');
+    Route::get('/parishes', ParishIndex::class)->name('parishes.index');
 });
 
 // --- GESTION DU PROFIL ---
@@ -58,6 +60,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
 });
 
 require __DIR__.'/auth.php';

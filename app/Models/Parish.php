@@ -14,26 +14,19 @@ class Parish extends Model
         'name',
         'city',
         'address',
-        'history',
+        'history',          // Rich Text
         'photo_path',
         'latitude',
         'longitude',
-        'mass_schedules', // Stocké en JSON
+        'mass_schedules',   // Rich Text
         'contact_phone',
     ];
 
     protected $casts = [
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',
-        'mass_schedules' => 'array', // Conversion automatique JSON <-> Array
     ];
 
-    /* -----------------------------------------------------------------
-     |  RELATIONS
-     | -----------------------------------------------------------------
-     */
-
-    // Une paroisse a plusieurs membres du clergé ou secrétaires
     public function users(): HasMany
     {
         return $this->hasMany(User::class);
