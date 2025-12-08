@@ -23,14 +23,17 @@ class ParishIndex extends Component
     public $address;
     public $contact_phone;
     
-    // Rich Texts (Initialisés à vide pour éviter le NULL)
+    // Coordonnées GPS (Nouveaux champs)
+    public $latitude;
+    public $longitude;
+    
+    // Rich Texts (Initialisation explicite à vide pour éviter le bug NULL)
     public $history = ''; 
     public $mass_schedules = ''; 
     
     public $photo;
     public $oldPhoto;
     
-    // Affichage
     public $currentParish;
 
     protected function rules()
@@ -40,6 +43,9 @@ class ParishIndex extends Component
             'city' => 'required',
             'address' => 'nullable|string',
             'contact_phone' => 'nullable|string',
+            // Validation numérique pour GPS
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
             'history' => 'nullable|string',
             'mass_schedules' => 'nullable|string',
             'photo' => 'nullable|image|max:2048',
@@ -64,7 +70,11 @@ class ParishIndex extends Component
         $this->address = $parish->address;
         $this->contact_phone = $parish->contact_phone;
         
-        // Gestion des NULLs pour Rich Text
+        // Récupération GPS
+        $this->latitude = $parish->latitude;
+        $this->longitude = $parish->longitude;
+        
+        // Gestion des NULLs pour Rich Text (Sécurité)
         $this->history = $parish->history ?? '';
         $this->mass_schedules = $parish->mass_schedules ?? '';
         
@@ -90,6 +100,9 @@ class ParishIndex extends Component
             'city' => $this->city,
             'address' => $this->address,
             'contact_phone' => $this->contact_phone,
+            'latitude' => $this->latitude,   // Enregistrement Lat
+            'longitude' => $this->longitude, // Enregistrement Long
+            // On force le string vide si null
             'history' => $this->history ?? '',
             'mass_schedules' => $this->mass_schedules ?? '',
         ];
@@ -129,7 +142,8 @@ class ParishIndex extends Component
 
     private function resetInputFields()
     {
-        $this->reset(['name', 'city', 'address', 'contact_phone', 'photo', 'oldPhoto', 'parishId', 'currentParish']);
+        // Reset complet
+        $this->reset(['name', 'city', 'address', 'contact_phone', 'latitude', 'longitude', 'photo', 'oldPhoto', 'parishId', 'currentParish']);
         $this->history = '';
         $this->mass_schedules = '';
         $this->resetErrorBag();

@@ -15,7 +15,9 @@ use App\Livewire\Admin\Songs\SongIndex;
 |--------------------------------------------------------------------------
 */
 
-Route::view('/', 'welcome');
+Route::get('/', function () {
+    return view('welcome-test');
+});
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
