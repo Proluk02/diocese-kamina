@@ -62,7 +62,7 @@
                 </div>
             </div>
 
-            <!-- NOUVELLE SECTION : STRUCTURES -->
+            <!-- SECTION : STRUCTURES -->
             <div class="mt-4 pt-4 border-t border-gray-800">
                 <h3 class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2" x-show="sidebarExpanded">
                     Structures
@@ -72,6 +72,19 @@
                     <!-- Icone Eglise -->
                     <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
                     <span x-show="sidebarExpanded" class="whitespace-nowrap">Paroisses</span>
+                </a>
+            </div>
+
+            <!-- SECTION : LITURGIE / MUSIQUE -->
+            <div class="mt-4 pt-4 border-t border-gray-800">
+                <h3 class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2" x-show="sidebarExpanded">
+                    Liturgie
+                </h3>
+                <a href="{{ route('admin.songs.index') }}" wire:navigate
+                   class="group flex items-center gap-3 rounded-xl px-3 py-2.5 font-medium transition-all duration-200 {{ request()->routeIs('admin.songs.*') ? 'bg-white/10 text-white shadow-lg' : 'text-gray-400 hover:bg-white/5 hover:text-white' }}">
+                    <!-- Icone Musique -->
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" /></svg>
+                    <span x-show="sidebarExpanded" class="whitespace-nowrap">Chants & Partitions</span>
                 </a>
             </div>
 

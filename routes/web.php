@@ -6,6 +6,8 @@ use App\Livewire\Admin\Articles\ArticleIndex;
 use App\Livewire\Admin\Categories\CategoryIndex;
 use App\Livewire\Admin\Documents\DocumentIndex;
 use App\Livewire\Admin\Parishes\ParishIndex;
+use App\Livewire\Admin\Users\UserIndex;
+use App\Livewire\Admin\Songs\SongIndex;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,6 +55,8 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::get('/categories', CategoryIndex::class)->name('categories.index');
     Route::get('/documents', DocumentIndex::class)->name('documents.index');
     Route::get('/parishes', ParishIndex::class)->name('parishes.index');
+    Route::get('/users', UserIndex::class)->name('users.index');
+    Route::get('/songs', SongIndex::class)->name('songs.index');
 });
 
 // --- GESTION DU PROFIL ---
