@@ -2,8 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
+use App\Livewire\Public\Resources\DocumentShow;
+use App\Livewire\Public\Donation;
 
-// --- IMPORTS COMPOSANTS ADMIN (Back-Office) ---
+// --- BACK-OFFICE (ADMIN) ---
 use App\Livewire\Admin\Articles\ArticleIndex;
 use App\Livewire\Admin\Categories\CategoryIndex;
 use App\Livewire\Admin\Documents\DocumentIndex;
@@ -11,46 +13,42 @@ use App\Livewire\Admin\Parishes\ParishIndex;
 use App\Livewire\Admin\Users\UserIndex;
 use App\Livewire\Admin\Songs\SongIndex;
 
-// --- IMPORTS COMPOSANTS PUBLIC (Site Vitrine) ---
+// --- FRONT-OFFICE (PUBLIC) ---
 use App\Livewire\Public\Home;
 use App\Livewire\Public\News\ArticleList;
 use App\Livewire\Public\News\ArticleShow;
 use App\Livewire\Public\Resources\DocumentList;
-use App\Livewire\Public\Resources\DocumentShow;
 use App\Livewire\Public\Info\Presentation;
 use App\Livewire\Public\Info\Contact;
+use App\Livewire\Public\Parishes\ParishList;
+use App\Livewire\Public\Parishes\ParishDetail;
+use App\Livewire\Public\Liturgy\SongLibrary; 
 
-/*
-|--------------------------------------------------------------------------
-| ROUTES PUBLIQUES (Accessibles à tous)
-|--------------------------------------------------------------------------
-*/
 
 // 1. PAGE D'ACCUEIL
 Route::get('/', Home::class)->name('home');
 
-// 2. ACTUALITÉS
-Route::get('/actualites', ArticleList::class)->name('news.index');
+// 2. ACTUALITÉS (Module A)
+Route::get('/actualites', ArticleList::class)->name('news.index'); // Nom adapté
 Route::get('/actualites/{slug}', ArticleShow::class)->name('news.show');
 
-// 3. INSTITUTIONNEL & RESSOURCES (Module A)
-Route::get('/presentation', Presentation::class)->name('presentation');
+// 3. PAROISSES (Module B)
+Route::get('/paroisses', ParishList::class)->name('parishes.public.index'); // Nom adapté
+Route::get('/paroisses/{id}', ParishDetail::class)->name('public.parishes.show'); 
 
-Route::get('/documents', DocumentList::class)->name('documents.public.index');
+// 4. LITURGIE & CHANTS (Module B)
+Route::get('/chantier-liturgique', SongLibrary::class)->name('liturgy.public.index'); 
+
+Route::get('/documents', DocumentList::class)->name('documents.public.index'); 
 Route::get('/documents/{id}', DocumentShow::class)->name('documents.public.show');
-Route::get('/contact', Contact::class)->name('contact');
 
-// 4. MODULE B (Placeholders en attendant le développement)
-// Ces routes permettent aux liens du menu de fonctionner sans erreur 404
-Route::get('/paroisses', function() { return view('coming-soon', ['title' => 'Paroisses']); })->name('parishes.public.index');
-Route::get('/liturgie', function() { return view('coming-soon', ['title' => 'Chants & Liturgie']); })->name('liturgy.public.index');
-Route::get('/don', function() { return view('coming-soon', ['title' => 'Faire un Don']); })->name('donation');
+// 6. PAGES INSTITUTIONNELLES (Module A)
+Route::get('/presentation', Presentation::class)->name('presentation'); 
+Route::get('/contact', Contact::class)->name('contact'); // Nom adapté
 
-/*
-|--------------------------------------------------------------------------
-| ROUTES ADMIN (Protégées par auth)
-|--------------------------------------------------------------------------
-*/
+// 7. DIVERS
+Route::get('/don', Donation::class)->name('public.donation');
+
 
 // Tableau de bord principal
 Route::view('dashboard', 'dashboard')
@@ -72,7 +70,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     // Administration Système
     Route::get('/users', UserIndex::class)->name('users.index');
 
-    // Paramètres (Page placeholder en attendant le développement)
+    // Paramètres (Page placeholder)
     Route::get('/settings', function () {
         return view('dashboard'); 
     })->name('settings.index');

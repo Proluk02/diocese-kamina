@@ -2,8 +2,8 @@
 
 namespace App\Livewire\Public\Resources;
 
-use Livewire\Component;
 use App\Models\Document;
+use Livewire\Component;
 
 class DocumentShow extends Component
 {
@@ -16,6 +16,7 @@ class DocumentShow extends Component
 
     public function getYoutubeEmbedUrl($url)
     {
+        // Même helper que dans l'admin pour afficher la vidéo
         if (preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i', $url, $matches)) {
             return 'https://www.youtube.com/embed/' . $matches[1];
         }

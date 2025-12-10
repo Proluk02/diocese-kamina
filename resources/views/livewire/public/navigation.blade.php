@@ -91,7 +91,7 @@
 
                     <!-- CTA Don -->
                     <div class="ml-4 pl-4 border-l border-gray-200">
-                        <a href="{{ route('donation') }}" class="flex items-center gap-2 bg-kamina-gold hover:bg-yellow-600 text-white px-5 py-2.5 rounded-full text-sm font-bold shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5">
+                        <a href="{{ route('public.donation') }}" class="flex items-center gap-2 bg-kamina-gold hover:bg-yellow-600 text-white px-5 py-2.5 rounded-full text-sm font-bold shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
                             Faire un Don
                         </a>
@@ -137,7 +137,7 @@
                 <a href="{{ route('liturgy.public.index') }}" class="block px-4 py-3 rounded-lg text-base font-medium text-gray-700 hover:bg-gray-50">
                     Liturgie
                 </a>
-                <a href="{{ route('donation') }}" class="block px-4 py-3 rounded-lg text-base font-bold text-kamina-gold bg-yellow-50 text-center mt-4">
+                <a href="{{ route('public.donation') }}" class="block px-4 py-3 rounded-lg text-base font-bold text-kamina-gold bg-yellow-50 text-center mt-4">
                     Faire un Don
                 </a>
             </div>
