@@ -8,6 +8,7 @@ class Presentation extends Component
 {
     public function render()
     {
-        return view('livewire.public.info.presentation');
+        return view('livewire.public.info.presentation')
+            ->layout('layouts.guest'); 
     }
 }

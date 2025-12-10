@@ -19,7 +19,6 @@ class ArticleShow extends Component
     public function render()
     {
         return view('livewire.public.news.article-show', [
-            // Articles suggérés (même catégorie, sauf celui-ci)
             'relatedPosts' => Post::where('category_id', $this->post->category_id)
                                   ->where('id', '!=', $this->post->id)
                                   ->where('status', 'published')

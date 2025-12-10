@@ -16,6 +16,6 @@ class Home extends Component
                                  ->take(3)
                                  ->with('category', 'user')
                                  ->get()
-        ])->layout('layouts.guest'); // Important : layout public
+        ])->layout('layouts.guest');
     }
 }

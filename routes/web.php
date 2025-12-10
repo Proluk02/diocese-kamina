@@ -19,6 +19,9 @@ use App\Livewire\Public\Resources\DocumentList;
 use App\Livewire\Public\Resources\DocumentShow;
 use App\Livewire\Public\Info\Presentation;
 use App\Livewire\Public\Info\Contact;
+use App\Livewire\Public\Parishes\ParishList;
+use App\Livewire\Public\Parishes\ParishDetail;
+use App\Livewire\Public\Liturgy\SongLibrary;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,8 +44,9 @@ Route::get('/contact', Contact::class)->name('contact');
 
 // 4. MODULE B (Placeholders en attendant le développement)
 // Ces routes permettent aux liens du menu de fonctionner sans erreur 404
-Route::get('/paroisses', function() { return view('coming-soon', ['title' => 'Paroisses']); })->name('parishes.public.index');
-Route::get('/liturgie', function() { return view('coming-soon', ['title' => 'Chants & Liturgie']); })->name('liturgy.public.index');
+Route::get('/paroisses', ParishList::class)->name('parishes.public.index');
+Route::get('/paroisses/{id}', ParishDetail::class)->name('parishes.public.show');
+Route::get('/liturgie', SongLibrary::class)->name('liturgy.public.index');
 Route::get('/don', function() { return view('coming-soon', ['title' => 'Faire un Don']); })->name('donation');
 
 /*
