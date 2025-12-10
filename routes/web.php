@@ -15,7 +15,6 @@ use App\Livewire\Admin\Songs\SongIndex;
 use App\Livewire\Public\Home;
 use App\Livewire\Public\News\ArticleList;
 use App\Livewire\Public\News\ArticleShow;
-
 use App\Livewire\Public\Resources\DocumentList;
 use App\Livewire\Public\Resources\DocumentShow;
 use App\Livewire\Public\Info\Presentation;
@@ -27,20 +26,24 @@ use App\Livewire\Public\Info\Contact;
 |--------------------------------------------------------------------------
 */
 
-// Page d'accueil
+// 1. PAGE D'ACCUEIL
 Route::get('/', Home::class)->name('home');
 
-// Blog / Actualités
+// 2. ACTUALITÉS
 Route::get('/actualites', ArticleList::class)->name('news.index');
 Route::get('/actualites/{slug}', ArticleShow::class)->name('news.show');
 
-// Documents & Homélies
+// 3. INSTITUTIONNEL & RESSOURCES (Module A)
+Route::get('/presentation', Presentation::class)->name('presentation');
 Route::get('/documents', DocumentList::class)->name('documents.public.index');
 Route::get('/documents/{id}', DocumentShow::class)->name('documents.public.show');
-
-// Informations
-Route::get('/presentation', Presentation::class)->name('presentation');
 Route::get('/contact', Contact::class)->name('contact');
+
+// 4. MODULE B (Placeholders en attendant le développement)
+// Ces routes permettent aux liens du menu de fonctionner sans erreur 404
+Route::get('/paroisses', function() { return view('coming-soon', ['title' => 'Paroisses']); })->name('parishes.public.index');
+Route::get('/liturgie', function() { return view('coming-soon', ['title' => 'Chants & Liturgie']); })->name('liturgy.public.index');
+Route::get('/don', function() { return view('coming-soon', ['title' => 'Faire un Don']); })->name('donation');
 
 /*
 |--------------------------------------------------------------------------

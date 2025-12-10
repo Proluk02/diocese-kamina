@@ -18,14 +18,16 @@
             </div>
 
             <!-- Colonne 2 : Liens Rapides -->
+
+            <!-- Colonne 2 : Liens Rapides -->
             <div>
                 <h3 class="text-lg font-bold mb-4 text-kamina-gold">Accès Rapide</h3>
                 <ul class="space-y-2 text-sm text-blue-100">
-                    <li><a href="#" class="hover:text-white hover:underline">Horaires des Messes</a></li>
-                    <li><a href="#" class="hover:text-white hover:underline">Dernières Actualités</a></li>
-                    <li><a href="#" class="hover:text-white hover:underline">Documents Officiels</a></li>
-                    <li><a href="#" class="hover:text-white hover:underline">Chants Liturgiques</a></li>
-                    <li><a href="#" class="hover:text-white hover:underline">Contacter l'Évêché</a></li>
+                    <li><a href="{{ route('parishes.public.index') }}" class="hover:text-white hover:underline">Horaires des Messes</a></li>
+                    <li><a href="{{ route('news.index') }}" class="hover:text-white hover:underline">Dernières Actualités</a></li>
+                    <li><a href="{{ route('documents.public.index') }}" class="hover:text-white hover:underline">Documents Officiels</a></li>
+                    <li><a href="{{ route('liturgy.public.index') }}" class="hover:text-white hover:underline">Chants Liturgiques</a></li>
+                    <li><a href="{{ route('contact') }}" class="hover:text-white hover:underline">Contacter l'Évêché</a></li>
                 </ul>
             </div>
 
