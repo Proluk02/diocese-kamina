@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
+
+// --- IMPORTS COMPOSANTS ADMIN (Back-Office) ---
 use App\Livewire\Admin\Articles\ArticleIndex;
 use App\Livewire\Admin\Categories\CategoryIndex;
 use App\Livewire\Admin\Documents\DocumentIndex;
@@ -9,64 +11,78 @@ use App\Livewire\Admin\Parishes\ParishIndex;
 use App\Livewire\Admin\Users\UserIndex;
 use App\Livewire\Admin\Songs\SongIndex;
 
+// --- IMPORTS COMPOSANTS PUBLIC (Site Vitrine) ---
+use App\Livewire\Public\Home;
+use App\Livewire\Public\News\ArticleList;
+use App\Livewire\Public\News\ArticleShow;
+
+use App\Livewire\Public\Resources\DocumentList;
+use App\Livewire\Public\Resources\DocumentShow;
+use App\Livewire\Public\Info\Presentation;
+use App\Livewire\Public\Info\Contact;
+
 /*
 |--------------------------------------------------------------------------
-| Web Routes
+| ROUTES PUBLIQUES (Accessibles à tous)
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', function () {
-    return view('welcome-test');
-});
+// Page d'accueil
+Route::get('/', Home::class)->name('home');
 
+// Blog / Actualités
+Route::get('/actualites', ArticleList::class)->name('news.index');
+Route::get('/actualites/{slug}', ArticleShow::class)->name('news.show');
+
+// Documents & Homélies
+Route::get('/documents', DocumentList::class)->name('documents.public.index');
+Route::get('/documents/{id}', DocumentShow::class)->name('documents.public.show');
+
+// Informations
+Route::get('/presentation', Presentation::class)->name('presentation');
+Route::get('/contact', Contact::class)->name('contact');
+
+/*
+|--------------------------------------------------------------------------
+| ROUTES ADMIN (Protégées par auth)
+|--------------------------------------------------------------------------
+*/
+
+// Tableau de bord principal
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
-// --- ZONE D'ADMINISTRATION ---
-// Ces routes servent de "placeholders" pour éviter l'erreur RouteNotFound
-// Nous créerons les vrais composants Livewire pour chaque page à l'étape suivante.
+// Groupe Administration
 Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
     
-    // Route: admin.articles.index
-    Route::get('/articles', function () {
-        return view('dashboard'); // Temporaire
-    })->name('articles.index');
-
-    // Route: admin.categories.index
-    Route::get('/categories', function () {
-        return view('dashboard'); // Temporaire
-    })->name('categories.index');
-
-    // Route: admin.documents.index
-    Route::get('/documents', function () {
-        return view('dashboard'); // Temporaire
-    })->name('documents.index');
-
-    // Route: admin.users.index
-    Route::get('/users', function () {
-        return view('dashboard'); // Temporaire
-    })->name('users.index');
-
-    // Route: admin.settings.index
-    Route::get('/settings', function () {
-        return view('dashboard'); // Temporaire
-    })->name('settings.index');
-
+    // Gestion de Contenu
     Route::get('/articles', ArticleIndex::class)->name('articles.index');
     Route::get('/categories', CategoryIndex::class)->name('categories.index');
     Route::get('/documents', DocumentIndex::class)->name('documents.index');
+
+    // Structures & Liturgie
     Route::get('/parishes', ParishIndex::class)->name('parishes.index');
-    Route::get('/users', UserIndex::class)->name('users.index');
     Route::get('/songs', SongIndex::class)->name('songs.index');
+
+    // Administration Système
+    Route::get('/users', UserIndex::class)->name('users.index');
+
+    // Paramètres (Page placeholder en attendant le développement)
+    Route::get('/settings', function () {
+        return view('dashboard'); 
+    })->name('settings.index');
 });
 
-// --- GESTION DU PROFIL ---
+/*
+|--------------------------------------------------------------------------
+| GESTION DU PROFIL UTILISATEUR
+|--------------------------------------------------------------------------
+*/
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    
 });
 
 require __DIR__.'/auth.php';
