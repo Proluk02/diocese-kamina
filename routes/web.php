@@ -35,6 +35,7 @@ Route::get('/actualites/{slug}', ArticleShow::class)->name('news.show');
 
 // 3. INSTITUTIONNEL & RESSOURCES (Module A)
 Route::get('/presentation', Presentation::class)->name('presentation');
+
 Route::get('/documents', DocumentList::class)->name('documents.public.index');
 Route::get('/documents/{id}', DocumentShow::class)->name('documents.public.show');
 Route::get('/contact', Contact::class)->name('contact');
