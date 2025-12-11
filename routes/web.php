@@ -10,6 +10,7 @@ use App\Livewire\Admin\Documents\DocumentIndex;
 use App\Livewire\Admin\Parishes\ParishIndex;
 use App\Livewire\Admin\Users\UserIndex;
 use App\Livewire\Admin\Songs\SongIndex;
+use App\Livewire\Admin\Settings\SettingsIndex;
 
 // --- IMPORTS COMPOSANTS PUBLIC (Site Vitrine) ---
 use App\Livewire\Public\Home;
@@ -22,6 +23,7 @@ use App\Livewire\Public\Info\Contact;
 use App\Livewire\Public\Parishes\ParishList;
 use App\Livewire\Public\Parishes\ParishDetail;
 use App\Livewire\Public\Liturgy\SongLibrary;
+use App\Livewire\Public\Donation;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,7 +49,7 @@ Route::get('/contact', Contact::class)->name('contact');
 Route::get('/paroisses', ParishList::class)->name('parishes.public.index');
 Route::get('/paroisses/{id}', ParishDetail::class)->name('parishes.public.show');
 Route::get('/liturgie', SongLibrary::class)->name('liturgy.public.index');
-Route::get('/don', function() { return view('coming-soon', ['title' => 'Faire un Don']); })->name('donation');
+Route::get('/don', Donation::class)->name('donation');
 
 /*
 |--------------------------------------------------------------------------
@@ -76,9 +78,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::get('/users', UserIndex::class)->name('users.index');
 
     // Paramètres (Page placeholder en attendant le développement)
-    Route::get('/settings', function () {
-        return view('dashboard'); 
-    })->name('settings.index');
+    Route::get('/settings', SettingsIndex::class)->name('settings.index');
 });
 
 /*
