@@ -1,9 +1,9 @@
 <div class="overflow-x-hidden bg-brand-light dark:bg-gray-900 transition-colors duration-300">
     
     <!-- ========================================================= -->
-    <!-- 1. HERO CARROUSEL (DYNAMIQUE) -->
+    <!-- 1. HERO CARROUSEL (PLEIN ÉCRAN) -->
     <!-- ========================================================= -->
-    <div class="relative h-[650px] md:h-[800px] overflow-hidden bg-gray-900" 
+    <div class="relative min-h-screen flex items-center justify-center overflow-hidden bg-gray-900" 
          x-data="{ 
             activeSlide: 0, 
             slides: {{ json_encode($slides) }},
@@ -24,116 +24,119 @@
             }
          }">
 
-        <!-- SLIDES -->
+        <!-- SLIDES (Background) -->
         <template x-for="(slide, index) in slides" :key="index">
             <div class="absolute inset-0 transition-opacity duration-1000 ease-in-out"
                  :class="activeSlide === index ? 'opacity-100 z-10' : 'opacity-0 z-0'">
                 
-                <!-- Image : Vérifie si c'est une image par défaut ou une image uploadée -->
                 <img :src="slide.includes('default') || slide.startsWith('http') ? slide : '/storage/' + slide" 
                      class="w-full h-full object-cover transform scale-105 origin-center transition-transform duration-[10000ms]"
                      :class="activeSlide === index ? 'scale-110' : 'scale-100'"
                      alt="Diocèse de Kamina">
                 
-                <!-- Overlay Dégradé (Pour lisibilité texte) -->
-                <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-brand-light dark:to-gray-900"></div>
+                <!-- Overlay Sombre (Essentiel pour le menu transparent) -->
+                <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-black/60"></div>
             </div>
         </template>
 
-        <!-- CONTENU TEXTE (Fixe par dessus les slides) -->
-        <div class="absolute inset-0 z-20 flex items-center justify-center text-center px-4">
-            <div class="max-w-5xl mx-auto" data-aos="fade-up" data-aos-duration="1000">
-                
-                <div class="inline-flex items-center gap-3 py-1 px-4 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-blue-50 text-sm font-semibold tracking-widest mb-6 shadow-lg">
-                    <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
-                    PORTAIL OFFICIEL
-                </div>
+        <!-- CONTENU TEXTE (Centré) -->
+        <div class="relative z-20 text-center px-4 w-full max-w-5xl mx-auto pt-20" data-aos="fade-up" data-aos-duration="1000">
+            
+            <div class="inline-flex items-center gap-3 py-1.5 px-5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-blue-50 text-sm font-bold tracking-widest mb-8 shadow-xl">
+                <span class="relative flex h-3 w-3">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                </span>
+                PORTAIL OFFICIEL
+            </div>
 
-                <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold font-playfair text-white mb-6 leading-tight drop-shadow-2xl">
-                    Diocèse de Kamina <br>
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-kamina-gold to-yellow-200 italic">Terre d'Espérance</span>
-                </h1>
+            <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold font-playfair text-white mb-8 leading-tight drop-shadow-2xl tracking-tight">
+                Diocèse de Kamina <br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-kamina-gold via-yellow-200 to-kamina-gold italic">Terre d'Espérance</span>
+            </h1>
 
-                <p class="text-lg md:text-2xl text-gray-100 max-w-2xl mx-auto mb-10 font-light drop-shadow-md leading-relaxed">
-                    Une Église famille, unie dans la prière, engagée dans la charité et tournée vers l'avenir de notre communauté.
-                </p>
+            <p class="text-lg md:text-2xl text-gray-200 max-w-3xl mx-auto mb-12 font-light drop-shadow-md leading-relaxed">
+                Une Église famille, unie dans la prière, engagée dans la charité et tournée vers l'avenir de notre communauté.
+            </p>
 
-                <div class="flex flex-col sm:flex-row justify-center gap-4">
-                    <a href="{{ route('news.index') }}" class="px-8 py-4 bg-kamina-gold hover:bg-yellow-600 text-white font-bold rounded-full transition-all shadow-lg shadow-yellow-500/30 transform hover:-translate-y-1 hover:shadow-xl">
-                        Suivre l'actualité
-                    </a>
-                    <a href="{{ route('parishes.public.index') }}" class="px-8 py-4 bg-white/10 backdrop-blur-md border border-white/50 text-white font-bold rounded-full hover:bg-white hover:text-kamina-blue transition-all">
-                        Trouver une paroisse
-                    </a>
-                </div>
+            <div class="flex flex-col sm:flex-row justify-center gap-6">
+                <a href="{{ route('news.index') }}" class="px-10 py-4 bg-kamina-gold hover:bg-yellow-600 text-white font-bold text-lg rounded-full transition-all shadow-lg shadow-yellow-500/30 transform hover:-translate-y-1 hover:shadow-xl hover:scale-105">
+                    Suivre l'actualité
+                </a>
+                <a href="{{ route('parishes.public.index') }}" class="px-10 py-4 bg-white/10 backdrop-blur-md border border-white/50 text-white font-bold text-lg rounded-full hover:bg-white hover:text-kamina-blue transition-all transform hover:-translate-y-1">
+                    Trouver une paroisse
+                </a>
             </div>
         </div>
 
-        <!-- INDICATEURS (Dots) -->
+        <!-- INDICATEURS -->
         <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-30 flex gap-3" x-show="slides.length > 1">
             <template x-for="(slide, index) in slides" :key="index">
                 <button @click="activeSlide = index; resetTimer()" 
-                        class="h-2 rounded-full transition-all duration-300"
-                        :class="activeSlide === index ? 'bg-kamina-gold w-8' : 'bg-white/50 w-2 hover:bg-white'">
+                        class="h-1.5 rounded-full transition-all duration-300"
+                        :class="activeSlide === index ? 'bg-kamina-gold w-12' : 'bg-white/40 w-6 hover:bg-white'">
                 </button>
             </template>
         </div>
         
-        <!-- SCROLL INDICATOR -->
-        <div class="absolute bottom-8 right-8 z-30 hidden md:block animate-bounce">
+        <!-- SCROLL MOUSE -->
+        <div class="absolute bottom-8 right-8 z-30 hidden lg:flex flex-col items-center gap-2 animate-bounce">
+            <span class="text-white/60 text-xs tracking-widest uppercase writing-vertical">Scroll</span>
             <svg class="w-6 h-6 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
         </div>
     </div>
 
     <!-- ========================================================= -->
-    <!-- 2. MOT DE L'ÉVÊQUE (Section Blanche/Clean) -->
+    <!-- 2. MOT DE L'ÉVÊQUE (MODERNISÉ) -->
     <!-- ========================================================= -->
-    <section class="py-24 bg-brand-surface dark:bg-gray-800 transition-colors duration-300">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row items-center gap-16">
+    <section class="py-24 bg-brand-surface dark:bg-gray-800 transition-colors duration-300 relative">
+        <!-- Pattern décoratif -->
+        <div class="absolute top-0 right-0 w-1/3 h-full bg-gray-50 dark:bg-gray-800/50 skew-x-12 transform origin-top-right z-0"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="flex flex-col lg:flex-row items-center gap-16">
                 
-                <!-- Image avec effet -->
-                <div class="w-full md:w-5/12" data-aos="fade-right">
-                    <div class="relative group">
-                        <div class="absolute -inset-3 bg-gradient-to-tr from-kamina-blue to-kamina-gold rounded-2xl opacity-20 group-hover:opacity-40 transition duration-500 blur-lg"></div>
-                        <div class="relative rounded-2xl overflow-hidden shadow-2xl">
-                            <!-- Placeholder: Remplacez par la vraie photo de l'évêque -->
+                <div class="w-full lg:w-5/12" data-aos="fade-right">
+                    <div class="relative">
+                        <!-- Cadre décoratif -->
+                        <div class="absolute -top-4 -left-4 w-full h-full border-2 border-kamina-gold rounded-3xl z-0"></div>
+                        <div class="relative rounded-3xl overflow-hidden shadow-2xl z-10 aspect-[3/4]">
                             <img src="{{ asset('storage/img/img1.jpg') }}" 
                                  alt="Mgr l'Évêque" 
-                                 class="w-full h-auto object-cover transform transition duration-700 group-hover:scale-105">
+                                 class="w-full h-full object-cover transform transition duration-700 hover:scale-105">
                             
-                            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-kamina-blue/90 to-transparent p-6 pt-20">
-                                <h3 class="text-white font-bold text-xl font-playfair">Mgr Léonard KAKUDJI</h3>
-                                <p class="text-kamina-gold text-sm font-medium tracking-wider uppercase">Évêque de Kamina</p>
+                            <!-- Cartouche Nom -->
+                            <div class="absolute bottom-6 left-6 right-6 bg-white/95 dark:bg-gray-900/95 backdrop-blur rounded-xl p-4 shadow-lg text-center border-l-4 border-kamina-gold">
+                                <h3 class="text-gray-900 dark:text-white font-bold text-xl font-playfair">Mgr Léonard KAKUDJI</h3>
+                                <p class="text-kamina-blue dark:text-blue-400 text-xs font-bold tracking-widest uppercase mt-1">Évêque de Kamina</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Texte -->
-                <div class="w-full md:w-7/12" data-aos="fade-left">
-                    <div class="inline-flex items-center gap-2 text-kamina-gold font-bold uppercase tracking-wider mb-4 text-xs">
-                        <span class="w-10 h-0.5 bg-kamina-gold"></span> Le Pasteur
+                <div class="w-full lg:w-7/12" data-aos="fade-left">
+                    <div class="inline-flex items-center gap-3 text-kamina-gold font-bold uppercase tracking-wider mb-6 text-xs bg-yellow-50 dark:bg-yellow-900/20 px-3 py-1 rounded-full">
+                        <span class="w-2 h-2 rounded-full bg-kamina-gold"></span> Le Pasteur
                     </div>
                     
-                    <h2 class="text-4xl md:text-5xl font-bold font-playfair text-gray-900 dark:text-white mb-8">
-                        Bienvenue chez Vous
+                    <h2 class="text-4xl md:text-6xl font-bold font-playfair text-gray-900 dark:text-white mb-8 leading-tight">
+                        Bienvenue <br> <span class="text-kamina-blue dark:text-blue-400">chez Vous</span>
                     </h2>
                     
-                    <div class="relative mb-8">
-                        <svg class="absolute -top-4 -left-6 w-12 h-12 text-gray-200 dark:text-gray-700 transform -scale-x-100" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21L14.017 18C14.017 16.0547 15.3789 13.9141 17.6172 12.375C15.3359 11.8359 14.017 10.4375 14.017 8.36719C14.017 5.70312 16.2734 3.79688 18.5781 3.79688C20.9297 3.79688 23.0781 5.60156 23.0781 9.07031C23.0781 14.3047 18.7344 21 14.017 21ZM5.39062 21L5.39062 18C5.39062 16.0547 6.75781 13.9141 8.98438 12.375C6.70312 11.8359 5.39062 10.4375 5.39062 8.36719C5.39062 5.70312 7.64062 3.79688 9.94531 3.79688C12.2969 3.79688 14.4453 5.60156 14.4453 9.07031C14.4453 14.3047 10.1016 21 5.39062 21Z"/></svg>
-                        <blockquote class="text-xl text-slate-600 dark:text-gray-300 italic pl-6 border-l-4 border-kamina-blue leading-relaxed relative z-10">
-                            "Chers frères et sœurs, que ce site soit un pont entre nos paroisses, nos communautés et le monde. Bâtissons ensemble une communauté fondée sur l'amour, la solidarité et la foi inébranlable en notre Seigneur."
+                    <div class="relative mb-10 pl-8">
+                        <svg class="absolute -top-4 -left-4 w-12 h-12 text-gray-100 dark:text-gray-700 transform -scale-x-100 -z-10" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21L14.017 18C14.017 16.0547 15.3789 13.9141 17.6172 12.375C15.3359 11.8359 14.017 10.4375 14.017 8.36719C14.017 5.70312 16.2734 3.79688 18.5781 3.79688C20.9297 3.79688 23.0781 5.60156 23.0781 9.07031C23.0781 14.3047 18.7344 21 14.017 21ZM5.39062 21L5.39062 18C5.39062 16.0547 6.75781 13.9141 8.98438 12.375C6.70312 11.8359 5.39062 10.4375 5.39062 8.36719C5.39062 5.70312 7.64062 3.79688 9.94531 3.79688C12.2969 3.79688 14.4453 5.60156 14.4453 9.07031C14.4453 14.3047 10.1016 21 5.39062 21Z"/></svg>
+                        <blockquote class="text-2xl text-slate-700 dark:text-gray-200 italic font-serif leading-relaxed">
+                            "Chers frères et sœurs, que ce site soit un pont entre nos paroisses et le monde. Bâtissons ensemble une communauté fondée sur l'amour."
                         </blockquote>
                     </div>
 
-                    <p class="text-slate-500 dark:text-gray-400 leading-relaxed mb-8">
+                    <p class="text-slate-500 dark:text-gray-400 text-lg leading-relaxed mb-10">
                         À travers ces pages, vous découvrirez la vitalité de nos œuvres, la richesse de notre liturgie et l'engagement de nos prêtres et laïcs. Que votre visite soit fructueuse et spirituelle.
                     </p>
 
-                    <a href="{{ route('presentation') }}" class="inline-flex items-center text-kamina-blue dark:text-kamina-gold font-bold hover:underline group">
+                    <a href="{{ route('presentation') }}" class="group inline-flex items-center text-white bg-kamina-blue hover:bg-blue-800 px-8 py-3 rounded-full font-bold transition-all shadow-lg hover:shadow-xl hover:-translate-y-1">
                         Lire la biographie complète
-                        <svg class="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                        <svg class="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
                     </a>
                 </div>
             </div>
@@ -141,85 +144,160 @@
     </section>
 
     <!-- ========================================================= -->
-    <!-- 3. ACTUALITÉS (Fond doux) -->
+    <!-- 3. ACTUALITÉS - DESIGN MAGAZINE MODERNE -->
     <!-- ========================================================= -->
-    <section class="py-24 bg-brand-light dark:bg-gray-900 transition-colors duration-300 relative">
-        <!-- Décoration fond -->
-        <div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-700 to-transparent"></div>
-
+    <section class="py-24 bg-gradient-to-b from-white to-gray-50/50 dark:from-gray-900 dark:to-gray-800/50 transition-colors duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row justify-between items-end mb-16" data-aos="fade-up">
-                <div>
-                    <span class="text-kamina-blue dark:text-blue-400 font-bold uppercase tracking-wider text-sm mb-2 block">Blog & Événements</span>
-                    <h2 class="text-4xl font-bold font-playfair text-gray-900 dark:text-white">À la Une</h2>
+            <div class="flex flex-col md:flex-row justify-between items-end mb-20" data-aos="fade-up">
+                <div class="mb-6 md:mb-0">
+                    <div class="inline-flex items-center gap-2 text-sm font-semibold text-kamina-gold uppercase tracking-wider mb-3">
+                        <div class="w-6 h-0.5 bg-kamina-gold"></div>
+                        Blog & Événements
+                    </div>
+                    <h2 class="text-4xl md:text-5xl font-bold font-playfair text-gray-900 dark:text-white leading-tight">
+                        Dernières <span class="text-transparent bg-clip-text bg-gradient-to-r from-kamina-blue to-blue-600">Actualités</span>
+                    </h2>
+                    <p class="text-gray-500 dark:text-gray-400 text-lg mt-4 max-w-2xl">
+                        Suivez la vie du diocèse, les événements marquants et les messages pastoraux.
+                    </p>
                 </div>
-                <a href="{{ route('news.index') }}" class="hidden md:flex items-center gap-2 px-5 py-2 rounded-full border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 font-medium hover:border-kamina-blue hover:text-kamina-blue dark:hover:text-white transition">
-                    Toutes les actualités
+                <a href="{{ route('news.index') }}" class="group inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-semibold hover:border-kamina-blue dark:hover:border-blue-500 hover:text-kamina-blue dark:hover:text-white hover:shadow-lg transition-all shadow-sm">
+                    Voir toutes les actualités
+                    <svg class="w-4 h-4 transform group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                 </a>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- DISPOSITION MAGAZINE ASYMÉTRIQUE -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 @forelse($latestPosts as $index => $post)
-                    <article class="group bg-brand-surface dark:bg-gray-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-brand-border dark:border-gray-700 flex flex-col h-full transform hover:-translate-y-1" 
-                             data-aos="fade-up" data-aos-delay="{{ $index * 100 }}">
-                        
-                        <!-- Image -->
-                        <div class="h-60 overflow-hidden relative">
-                            @if($post->image_path)
-                                <img src="{{ asset('storage/' . $post->image_path) }}" alt="{{ $post->title }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
-                            @else
-                                <div class="w-full h-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-400">
-                                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    @if($index === 0)
+                        <!-- ARTICLE PRINCIPAL (GRAND) -->
+                        <article class="lg:col-span-7 group relative bg-white dark:bg-gray-800 rounded-[2rem] shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-100 dark:border-gray-700" 
+                                 data-aos="fade-right">
+                            <div class="flex flex-col h-full">
+                                <!-- Image avec overlay gradient -->
+                                <div class="h-80 md:h-96 overflow-hidden relative">
+                                    @if($post->image_path)
+                                        <img src="{{ asset('storage/' . $post->image_path) }}" alt="{{ $post->title }}" 
+                                             class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105">
+                                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                                    @else
+                                        <div class="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center">
+                                            <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
+                                        </div>
+                                    @endif
+                                    <!-- Badge -->
+                                    <div class="absolute top-6 left-6">
+                                        <span class="bg-white/95 dark:bg-gray-900/95 backdrop-blur text-kamina-blue dark:text-blue-300 text-xs font-bold px-4 py-2 rounded-full shadow-lg border border-white/20">
+                                            {{ $post->category->name }}
+                                        </span>
+                                    </div>
                                 </div>
-                            @endif
-                            
-                            <!-- Catégorie -->
-                            <div class="absolute top-4 left-4">
-                                <span class="bg-white/95 dark:bg-gray-900/90 backdrop-blur text-kamina-blue dark:text-blue-300 text-xs font-bold px-3 py-1.5 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
-                                    {{ $post->category->name }}
-                                </span>
-                            </div>
-                        </div>
-                        
-                        <!-- Contenu -->
-                        <div class="p-8 flex-1 flex flex-col">
-                            <div class="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500 mb-3 font-medium">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                {{ $post->created_at->format('d M Y') }}
-                            </div>
-                            
-                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-kamina-blue dark:group-hover:text-kamina-gold transition-colors line-clamp-2 leading-tight">
-                                <a href="{{ route('news.show', $post->slug) }}">
-                                    {{ $post->title }}
-                                </a>
-                            </h3>
-                            
-                            <p class="text-slate-500 dark:text-gray-400 text-sm leading-relaxed line-clamp-3 mb-6 flex-1">
-                                {{ $post->excerpt ?? Str::limit(strip_tags($post->body), 110) }}
-                            </p>
-                            
-                            <div class="pt-6 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
-                                <a href="{{ route('news.show', $post->slug) }}" class="text-sm font-bold text-kamina-blue dark:text-blue-400 group-hover:underline">
-                                    Lire l'article
-                                </a>
-                                <div class="h-8 w-8 rounded-full bg-gray-50 dark:bg-gray-700 flex items-center justify-center text-gray-400 group-hover:bg-kamina-blue group-hover:text-white transition-colors">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                                
+                                <!-- Contenu -->
+                                <div class="p-10 flex-1">
+                                    <!-- Métadonnées élégantes -->
+                                    <div class="flex items-center gap-4 text-xs font-medium text-gray-500 dark:text-gray-400 mb-6">
+                                        <div class="flex items-center gap-2">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                            {{ $post->created_at->format('d M Y') }}
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <div class="h-1 w-1 rounded-full bg-gray-300"></div>
+                                            <span class="flex items-center gap-1">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                                {{ $post->user->name }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Titre -->
+                                    <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-6 group-hover:text-kamina-blue dark:group-hover:text-blue-400 transition-colors">
+                                        <a href="{{ route('news.show', $post->slug) }}" class="hover:no-underline">
+                                            {{ $post->title }}
+                                        </a>
+                                    </h3>
+                                    
+                                    <!-- Extrait -->
+                                    <p class="text-gray-600 dark:text-gray-300 text-lg leading-relaxed mb-8 line-clamp-3">
+                                        {{ $post->excerpt ?? Str::limit(strip_tags($post->body), 160) }}
+                                    </p>
+                                    
+                                    <!-- Lire la suite -->
+                                    <div class="flex items-center justify-between pt-6 border-t border-gray-100 dark:border-gray-700">
+                                        <a href="{{ route('news.show', $post->slug) }}" 
+                                           class="group/link inline-flex items-center gap-2 text-kamina-blue dark:text-blue-400 font-semibold hover:text-kamina-gold dark:hover:text-yellow-400 transition-colors">
+                                            Lire l'article complet
+                                            <svg class="w-5 h-5 transform group-hover/link:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                                        </a>
+                                        <span class="text-xs text-gray-400">Temps de lecture : 5 min</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </article>
+                        </article>
+                    @else
+                        <!-- ARTICLES SECONDAIRES (PETITS) -->
+                        <article class="lg:col-span-5 group relative bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 overflow-hidden border border-gray-100 dark:border-gray-700" 
+                                 data-aos="fade-up" data-aos-delay="{{ $index * 100 }}">
+                            <div class="flex h-full">
+                                <!-- Image -->
+                                <div class="w-2/5 relative overflow-hidden">
+                                    @if($post->image_path)
+                                        <img src="{{ asset('storage/' . $post->image_path) }}" alt="{{ $post->title }}" 
+                                             class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                                    @else
+                                        <div class="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center">
+                                            <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                        </div>
+                                    @endif
+                                </div>
+                                
+                                <!-- Contenu -->
+                                <div class="w-3/5 p-6 flex flex-col">
+                                    <!-- Catégorie -->
+                                    <span class="text-xs font-bold text-kamina-blue dark:text-blue-300 uppercase tracking-wider mb-2">
+                                        {{ $post->category->name }}
+                                    </span>
+                                    
+                                    <!-- Titre -->
+                                    <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-3 group-hover:text-kamina-blue dark:group-hover:text-blue-400 transition-colors line-clamp-2">
+                                        <a href="{{ route('news.show', $post->slug) }}">
+                                            {{ $post->title }}
+                                        </a>
+                                    </h4>
+                                    
+                                    <!-- Date -->
+                                    <div class="text-xs text-gray-500 dark:text-gray-400 mb-4 flex items-center gap-1">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        {{ $post->created_at->format('d M Y') }}
+                                    </div>
+                                    
+                                    <!-- Bouton Lire -->
+                                    <div class="mt-auto pt-4 border-t border-gray-100 dark:border-gray-700">
+                                        <a href="{{ route('news.show', $post->slug) }}" 
+                                           class="text-sm font-medium text-kamina-blue dark:text-blue-400 hover:text-kamina-gold dark:hover:text-yellow-400 transition-colors flex items-center gap-1">
+                                            Lire l'article
+                                            <svg class="w-4 h-4 transform group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    @endif
                 @empty
-                    <div class="col-span-3 text-center py-20">
-                        <div class="inline-block p-4 rounded-full bg-gray-100 dark:bg-gray-800 mb-4 text-gray-400">
-                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
+                    <div class="col-span-12 text-center py-20">
+                        <div class="inline-block p-6 rounded-2xl bg-white dark:bg-gray-800 shadow-lg mb-6">
+                            <svg class="w-12 h-12 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
                         </div>
-                        <p class="text-gray-500 dark:text-gray-400 text-lg">Aucune actualité récente.</p>
+                        <h3 class="text-xl font-semibold text-gray-500 dark:text-gray-400 mb-2">Aucune actualité récente</h3>
+                        <p class="text-gray-400 dark:text-gray-500">Les nouvelles publications apparaîtront ici.</p>
                     </div>
                 @endforelse
             </div>
             
-            <div class="mt-12 text-center md:hidden">
-                <a href="{{ route('news.index') }}" class="inline-block px-8 py-3 bg-white border border-gray-200 text-kamina-blue font-bold rounded-full shadow-sm">
+            <!-- BOUTON MOBILE -->
+            <div class="mt-16 text-center lg:hidden">
+                <a href="{{ route('news.index') }}" class="inline-block px-10 py-3.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-semibold rounded-full hover:border-kamina-blue hover:text-kamina-blue transition-all shadow-sm">
                     Voir le blog
                 </a>
             </div>
@@ -227,46 +305,130 @@
     </section>
 
     <!-- ========================================================= -->
-    <!-- 4. BANNIÈRE SERVICES (Accès Rapides) -->
+    <!-- 4. VIE DU DIOCÈSE - DISPOSITION INTERACTIVE -->
     <!-- ========================================================= -->
-    <section class="py-20 bg-kamina-blue dark:bg-blue-900 relative overflow-hidden">
-        <!-- Texture subtile -->
-        <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
-        <div class="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl -mr-20 -mt-20"></div>
-        <div class="absolute bottom-0 left-0 w-96 h-96 bg-kamina-gold/20 rounded-full blur-3xl -ml-20 -mb-20"></div>
+    <section class="py-24 bg-gradient-to-br from-kamina-blue via-blue-800 to-blue-900 dark:from-gray-900 dark:via-blue-950 dark:to-blue-900 relative overflow-hidden">
+        <!-- Éléments décoratifs -->
+        <div class="absolute inset-0 opacity-5">
+            <div class="absolute top-0 left-0 w-72 h-72 bg-white rounded-full blur-3xl"></div>
+            <div class="absolute bottom-0 right-0 w-96 h-96 bg-kamina-gold/20 rounded-full blur-3xl"></div>
+        </div>
+        
+        <!-- Pattern subtil -->
+        <div class="absolute inset-0 opacity-[0.02]" style="background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="text-center mb-12" data-aos="fade-up">
-                <h2 class="text-3xl md:text-4xl font-bold font-playfair text-white mb-2">Vie du Diocèse</h2>
-                <p class="text-blue-200">Accédez rapidement aux informations essentielles.</p>
+            <!-- En-tête avec tagline -->
+            <div class="text-center mb-20" data-aos="fade-up">
+                <div class="inline-flex items-center gap-3 text-blue-200 text-sm font-semibold uppercase tracking-wider mb-6">
+                    <div class="h-px w-8 bg-blue-400"></div>
+                    Accès Rapide
+                    <div class="h-px w-8 bg-blue-400"></div>
+                </div>
+                <h2 class="text-4xl md:text-5xl font-bold font-playfair text-white mb-6">
+                    Explorez la <span class="text-transparent bg-clip-text bg-gradient-to-r from-kamina-gold to-yellow-300">Vie du Diocèse</span>
+                </h2>
+                <p class="text-blue-100 text-lg max-w-2xl mx-auto">
+                    Portails essentiels pour votre cheminement spirituel et votre engagement communautaire
+                </p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Carte 1 -->
-                <a href="{{ route('parishes.public.index') }}" class="group p-8 rounded-3xl bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-sm transition duration-300 text-center" data-aos="fade-up" data-aos-delay="0">
-                    <div class="h-20 w-20 bg-gradient-to-br from-kamina-gold to-yellow-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl group-hover:scale-110 transition-transform duration-300">
-                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-white mb-2">Paroisses & Messes</h3>
-                    <p class="text-blue-100 text-sm opacity-80">Trouvez l'église la plus proche et consultez les horaires.</p>
-                </a>
+            <!-- DISPOSITION EN DIAMANT/CARROUSEL -->
+            <div class="relative" x-data="{ activeCard: 0 }">
+                <!-- Cartes principales -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    @php
+                        $services = [
+                            [
+                                'route' => 'parishes.public.index',
+                                'icon' => 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4',
+                                'title' => 'Paroisses & Messes',
+                                'desc' => 'Trouvez l\'église la plus proche, consultez les horaires et rejoignez une communauté.',
+                                'color' => 'from-kamina-gold to-yellow-600'
+                            ],
+                            [
+                                'route' => 'liturgy.public.index',
+                                'icon' => 'M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3',
+                                'title' => 'Liturgie & Chants',
+                                'desc' => 'Bibliothèque de chants sacrés, partitions et audios pour vos célébrations.',
+                                'color' => 'from-blue-400 to-blue-600'
+                            ],
+                            [
+                                'route' => 'documents.public.index',
+                                'icon' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
+                                'title' => 'Documents Officiels',
+                                'desc' => 'Accédez aux homélies, lettres pastorales et communiqués de l\'Évêché.',
+                                'color' => 'from-green-400 to-green-600'
+                            ]
+                        ];
+                    @endphp
 
-                <!-- Carte 2 -->
-                <a href="{{ route('liturgy.public.index') }}" class="group p-8 rounded-3xl bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-sm transition duration-300 text-center" data-aos="fade-up" data-aos-delay="100">
-                    <div class="h-20 w-20 bg-gradient-to-br from-kamina-gold to-yellow-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl group-hover:scale-110 transition-transform duration-300">
-                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path></svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-white mb-2">Liturgie & Chants</h3>
-                    <p class="text-blue-100 text-sm opacity-80">Notre bibliothèque de chants sacrés, partitions et audios.</p>
-                </a>
-
-                <!-- Carte 3 -->
-                <a href="{{ route('documents.public.index') }}" class="group p-8 rounded-3xl bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-sm transition duration-300 text-center" data-aos="fade-up" data-aos-delay="200">
-                    <div class="h-20 w-20 bg-gradient-to-br from-kamina-gold to-yellow-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl group-hover:scale-110 transition-transform duration-300">
-                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-white mb-2">Documents Officiels</h3>
-                    <p class="text-blue-100 text-sm opacity-80">Accédez aux homélies, lettres pastorales et communiqués.</p>
+                    @foreach($services as $index => $service)
+                        <div class="relative" 
+                             @mouseenter="activeCard = {{ $index }}" 
+                             @mouseleave="activeCard = null"
+                             data-aos="fade-up" data-aos-delay="{{ $index * 150 }}">
+                            <!-- Carte principale -->
+                            <a href="{{ route($service['route']) }}" 
+                               class="group relative block h-full p-8 rounded-[2rem] bg-white/[0.08] border border-white/20 backdrop-blur-xl transition-all duration-500 hover:bg-white/[0.12] hover:-translate-y-4 hover:shadow-2xl hover:shadow-blue-500/20">
+                                <!-- Effet de lumière au hover -->
+                                <div class="absolute inset-0 bg-gradient-to-br {{ $service['color'] }} opacity-0 group-hover:opacity-10 transition-opacity duration-500 rounded-[2rem]"></div>
+                                
+                                <!-- Icone animée -->
+                                <div class="relative mb-8">
+                                    <div class="absolute inset-0 bg-gradient-to-br {{ $service['color'] }} opacity-20 blur-xl rounded-2xl transform group-hover:scale-125 transition-transform duration-500"></div>
+                                    <div class="relative h-24 w-24 bg-gradient-to-br {{ $service['color'] }} rounded-2xl flex items-center justify-center mx-auto shadow-2xl group-hover:scale-110 transition-transform duration-300">
+                                        <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="{{ $service['icon'] }}"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                                
+                                <!-- Contenu texte -->
+                                <div class="relative text-center">
+                                    <h3 class="text-2xl font-bold text-white mb-4 group-hover:text-kamina-gold transition-colors">
+                                        {{ $service['title'] }}
+                                    </h3>
+                                    <p class="text-blue-100/80 text-sm leading-relaxed mb-6">
+                                        {{ $service['desc'] }}
+                                    </p>
+                                    
+                                    <!-- Bouton d'accès -->
+                                    <div class="inline-flex items-center gap-2 text-sm font-semibold text-white/80 group-hover:text-white transition-colors">
+                                        Accéder
+                                        <svg class="w-4 h-4 transform group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </a>
+                            
+                            <!-- Ligne de connexion (visuelle) -->
+                            @if($index < count($services) - 1)
+                                <div class="hidden md:block absolute top-1/2 right-0 w-full h-0.5 bg-gradient-to-r from-transparent via-white/30 to-transparent transform translate-x-1/2 -translate-y-1/2 z-0"></div>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+                
+                <!-- Points indicateurs (mobile) -->
+                <div class="flex justify-center gap-3 mt-12 md:hidden">
+                    @foreach($services as $index => $service)
+                        <button class="h-2 rounded-full transition-all duration-300"
+                                :class="activeCard === {{ $index }} ? 'bg-white w-8' : 'bg-white/30 w-4'"
+                                @click="activeCard = {{ $index }}">
+                        </button>
+                    @endforeach
+                </div>
+            </div>
+            
+            <!-- Appel à action -->
+            <div class="text-center mt-20" data-aos="fade-up" data-aos-delay="300">
+                <p class="text-blue-100 text-lg mb-8">Vous souhaitez vous engager davantage ?</p>
+                <a href="{{ route('contact') }}" 
+                   class="group inline-flex items-center gap-3 px-10 py-4 bg-white text-kamina-blue font-bold text-lg rounded-full hover:bg-blue-50 transition-all duration-300 shadow-2xl hover:shadow-3xl hover:-translate-y-1">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"></path></svg>
+                    Nous contacter
                 </a>
             </div>
         </div>
