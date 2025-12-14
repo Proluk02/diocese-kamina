@@ -6,6 +6,14 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ config('app.name', 'Diocèse de Kamina') }}</title>
+        <!-- META DESCRIPTION DYNAMIQUE -->
+    <meta name="description" content="{{ $description ?? 'Site officiel du Diocèse de Kamina. Actualités, Paroisses, Liturgie et Enseignements.' }}">
+
+    <!-- OPEN GRAPH (Facebook/WhatsApp) -->
+    <meta property="og:title" content="{{ $title ?? config('app.name') }}">
+    <meta property="og:description" content="{{ $description ?? 'Site officiel du Diocèse de Kamina.' }}">
+    <meta property="og:image" content="{{ asset('images/og-image-default.jpg') }}">
+    <meta property="og:url" content="{{ url()->current() }}">
 
     <!-- Fonts : Inter (Corps) & Playfair Display (Titres) -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -13,6 +21,8 @@
 
     <!-- AOS Animation CSS -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])

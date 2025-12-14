@@ -1,19 +1,22 @@
-<div class="space-y-6 animate-fadeIn pb-10">
+<div class="space-y-8 animate-fadeIn pb-20">
     
     <!-- HEADER -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
             <h2 class="text-3xl font-bold text-gray-800 dark:text-white tracking-tight">Paramètres Généraux</h2>
-            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Configuration des informations du site public.</p>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Gérez l'identité et le contenu statique du site.</p>
         </div>
-        <button wire:click="save" class="inline-flex items-center justify-center px-5 py-2.5 text-sm font-medium text-white bg-kamina-blue hover:bg-blue-800 rounded-xl shadow-lg transition-all hover:-translate-y-0.5">
-            <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-            Enregistrer les modifications
+        <button wire:click="save" wire:loading.attr="disabled" class="inline-flex items-center justify-center px-6 py-3 text-sm font-bold text-white bg-kamina-blue hover:bg-blue-800 rounded-xl shadow-lg transition-all hover:-translate-y-0.5">
+            <span wire:loading.remove class="flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                Enregistrer tout
+            </span>
+            <span wire:loading>Sauvegarde...</span>
         </button>
     </div>
 
     @if (session()->has('success'))
-        <div class="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-300 px-4 py-3 rounded-xl flex items-center gap-3">
+        <div class="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-300 px-4 py-3 rounded-xl flex items-center gap-3 animate-fade-in-up">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             {{ session('success') }}
         </div>
@@ -21,28 +24,21 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
-        <!-- Identité -->
-        <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 space-y-5">
-            <h3 class="text-lg font-bold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-3">Identité du Site</h3>
+        <!-- 1. IDENTITÉ & CONTACT -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 space-y-6">
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-3 flex items-center gap-2">
+                <svg class="w-5 h-5 text-kamina-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                Identité du Site
+            </h3>
             
             <div>
-                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Nom du Site / Diocèse</label>
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Nom du Diocèse</label>
                 <input type="text" wire:model="site_name" class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm focus:ring-kamina-gold focus:border-kamina-gold p-2.5">
             </div>
 
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Adresse Physique</label>
-                <textarea wire:model="contact_address" rows="3" class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm focus:ring-kamina-gold focus:border-kamina-gold p-2.5"></textarea>
-            </div>
-        </div>
-
-        <!-- Contact & Réseaux -->
-        <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 space-y-5">
-            <h3 class="text-lg font-bold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-3">Contact & Réseaux Sociaux</h3>
-            
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Email Officiel</label>
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Email Contact</label>
                     <input type="email" wire:model="contact_email" class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm focus:ring-kamina-gold focus:border-kamina-gold p-2.5">
                 </div>
                 <div>
@@ -52,53 +48,109 @@
             </div>
 
             <div>
-                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Lien Page Facebook</label>
-                <input type="url" wire:model="facebook_url" placeholder="https://facebook.com/..." class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm focus:ring-kamina-gold focus:border-kamina-gold p-2.5">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Adresse Physique</label>
+                <textarea wire:model="contact_address" rows="2" class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm focus:ring-kamina-gold focus:border-kamina-gold p-2.5"></textarea>
             </div>
 
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Lien Chaîne YouTube</label>
-                <input type="url" wire:model="youtube_url" placeholder="https://youtube.com/..." class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm focus:ring-kamina-gold focus:border-kamina-gold p-2.5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Lien Facebook</label>
+                    <input type="url" wire:model="facebook_url" class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm focus:ring-kamina-gold focus:border-kamina-gold p-2.5" placeholder="https://...">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Lien YouTube</label>
+                    <input type="url" wire:model="youtube_url" class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm focus:ring-kamina-gold focus:border-kamina-gold p-2.5" placeholder="https://...">
+                </div>
             </div>
         </div>
 
-        <!-- SECTION CARROUSEL -->
-        <div class="col-span-1 lg:col-span-2 bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
-            <h3 class="text-lg font-bold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-3 mb-4">
-                Images du Carrousel (Page d'accueil)
+        <!-- 2. CARROUSEL ACCUEIL -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 space-y-6">
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-3 flex items-center gap-2">
+                <svg class="w-5 h-5 text-kamina-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                Images Carrousel (Accueil)
             </h3>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <!-- Zone d'ajout -->
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Ajouter une nouvelle image</label>
-                    <div class="flex items-center gap-4">
-                        <input type="file" wire:model="newSlide" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-gray-700 dark:file:text-gray-300">
-                        <button wire:click="addSlide" wire:loading.attr="disabled" class="px-4 py-2 bg-kamina-gold text-white rounded-lg hover:bg-yellow-600 transition disabled:opacity-50">
-                            <span wire:loading.remove>Ajouter</span>
-                            <span wire:loading>...</span>
-                        </button>
-                    </div>
-                    @error('newSlide') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Ajouter une image</label>
+                <div class="flex items-center gap-3">
+                    <label class="flex-1 cursor-pointer bg-gray-50 dark:bg-gray-700 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-2 text-center hover:bg-gray-100 dark:hover:bg-gray-600 transition">
+                        <span class="text-sm text-gray-500 dark:text-gray-400" wire:loading.remove wire:target="newSlide">Cliquez pour choisir un fichier</span>
+                        <span class="text-sm text-kamina-blue animate-pulse" wire:loading wire:target="newSlide">Chargement...</span>
+                        <input type="file" wire:model="newSlide" class="hidden" accept="image/*">
+                    </label>
+                    <button wire:click="addSlide" wire:loading.attr="disabled" class="px-4 py-2 bg-kamina-gold text-white rounded-lg hover:bg-yellow-600 transition disabled:opacity-50 font-bold text-sm">
+                        Ajouter
+                    </button>
                 </div>
+                @error('newSlide') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
+            </div>
 
-                <!-- Liste des images (Preview) -->
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                    @forelse($slides as $index => $slide)
-                        <div class="relative group rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm">
-                            <img src="{{ asset('storage/'.$slide) }}" class="w-full h-24 object-cover">
-                            <button wire:click="removeSlide({{ $index }})" class="absolute top-1 right-1 bg-red-600 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition shadow-md">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            <!-- Liste des images -->
+            <div class="grid grid-cols-3 gap-3 max-h-64 overflow-y-auto custom-scrollbar p-1">
+                @forelse($slides as $index => $slide)
+                    <div class="relative group rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm aspect-video">
+                        <!-- CORRECTION ICI : Utilisation de str_contains au lieu de .includes -->
+                        <img src="{{ str_contains($slide, 'default') ? $slide : asset('storage/'.$slide) }}" class="w-full h-full object-cover">
+                        
+                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <button wire:click="removeSlide({{ $index }})" class="bg-red-600 text-white p-1.5 rounded-full hover:bg-red-700 transition transform hover:scale-110">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                             </button>
                         </div>
-                    @empty
-                        <p class="text-gray-400 text-sm italic col-span-3">Aucune image. Une image par défaut sera affichée.</p>
-                    @endforelse
-                </div>
+                    </div>
+                @empty
+                    <p class="text-gray-400 text-xs italic col-span-3 text-center py-4 bg-gray-50 dark:bg-gray-900 rounded-lg">Aucune image. Le site utilisera les images par défaut.</p>
+                @endforelse
             </div>
         </div>
 
-    <!-- ... suite du code ... -->
-
     </div>
+
+    <!-- 3. PRÉSENTATION & CONTENU -->
+    <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 space-y-8 mt-8">
+        <h3 class="text-lg font-bold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-3 flex items-center gap-2">
+            <svg class="w-5 h-5 text-kamina-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+            Contenu de la page "Qui sommes-nous"
+        </h3>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <!-- Histoire -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Histoire du Diocèse</label>
+                <div class="bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                    <x-rich-text wire:model="history_text" />
+                </div>
+                <p class="text-xs text-gray-500 mt-1">Ce texte apparaîtra dans la section "Notre Histoire".</p>
+            </div>
+
+            <!-- Mission -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Mission & Vision</label>
+                <div class="bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                    <x-rich-text wire:model="mission_text" />
+                </div>
+                <p class="text-xs text-gray-500 mt-1">Ce texte apparaîtra sous le titre "Notre Mission".</p>
+            </div>
+
+        </div>
+
+        <div class="border-t border-gray-100 dark:border-gray-700 pt-6">
+            <h4 class="text-md font-bold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider text-xs">Informations sur l'Évêque</h4>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Nom de l'Évêque</label>
+                    <input type="text" wire:model="bishop_name" class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm focus:ring-kamina-gold focus:border-kamina-gold p-2.5">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Biographie courte</label>
+                    <textarea wire:model="bishop_bio" rows="4" class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm focus:ring-kamina-gold focus:border-kamina-gold p-2.5"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>

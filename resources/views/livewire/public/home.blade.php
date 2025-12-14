@@ -144,160 +144,84 @@
     </section>
 
     <!-- ========================================================= -->
-    <!-- 3. ACTUALITÉS - DESIGN MAGAZINE MODERNE -->
+    <!-- 3. ACTUALITÉS (DESIGN CARTES FLOTTANTES) -->
     <!-- ========================================================= -->
-    <section class="py-24 bg-gradient-to-b from-white to-gray-50/50 dark:from-gray-900 dark:to-gray-800/50 transition-colors duration-300">
+    <section class="py-24 bg-brand-light dark:bg-gray-900 transition-colors duration-300 relative">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row justify-between items-end mb-20" data-aos="fade-up">
-                <div class="mb-6 md:mb-0">
-                    <div class="inline-flex items-center gap-2 text-sm font-semibold text-kamina-gold uppercase tracking-wider mb-3">
-                        <div class="w-6 h-0.5 bg-kamina-gold"></div>
-                        Blog & Événements
-                    </div>
-                    <h2 class="text-4xl md:text-5xl font-bold font-playfair text-gray-900 dark:text-white leading-tight">
-                        Dernières <span class="text-transparent bg-clip-text bg-gradient-to-r from-kamina-blue to-blue-600">Actualités</span>
-                    </h2>
-                    <p class="text-gray-500 dark:text-gray-400 text-lg mt-4 max-w-2xl">
-                        Suivez la vie du diocèse, les événements marquants et les messages pastoraux.
-                    </p>
+            <div class="flex flex-col md:flex-row justify-between items-end mb-16" data-aos="fade-up">
+                <div>
+                    <span class="text-kamina-blue dark:text-blue-400 font-bold uppercase tracking-wider text-sm mb-2 block">Blog & Événements</span>
+                    <h2 class="text-4xl font-bold font-playfair text-gray-900 dark:text-white">À la Une</h2>
                 </div>
-                <a href="{{ route('news.index') }}" class="group inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-semibold hover:border-kamina-blue dark:hover:border-blue-500 hover:text-kamina-blue dark:hover:text-white hover:shadow-lg transition-all shadow-sm">
-                    Voir toutes les actualités
-                    <svg class="w-4 h-4 transform group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                <a href="{{ route('news.index') }}" class="hidden md:flex items-center gap-2 px-6 py-2.5 rounded-full border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 font-medium hover:border-kamina-blue hover:text-kamina-blue dark:hover:text-white hover:bg-white dark:hover:bg-gray-800 transition shadow-sm">
+                    Toutes les actualités
                 </a>
             </div>
 
-            <!-- DISPOSITION MAGAZINE ASYMÉTRIQUE -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
                 @forelse($latestPosts as $index => $post)
-                    @if($index === 0)
-                        <!-- ARTICLE PRINCIPAL (GRAND) -->
-                        <article class="lg:col-span-7 group relative bg-white dark:bg-gray-800 rounded-[2rem] shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-100 dark:border-gray-700" 
-                                 data-aos="fade-right">
-                            <div class="flex flex-col h-full">
-                                <!-- Image avec overlay gradient -->
-                                <div class="h-80 md:h-96 overflow-hidden relative">
-                                    @if($post->image_path)
-                                        <img src="{{ asset('storage/' . $post->image_path) }}" alt="{{ $post->title }}" 
-                                             class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105">
-                                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-                                    @else
-                                        <div class="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center">
-                                            <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
-                                        </div>
-                                    @endif
-                                    <!-- Badge -->
-                                    <div class="absolute top-6 left-6">
-                                        <span class="bg-white/95 dark:bg-gray-900/95 backdrop-blur text-kamina-blue dark:text-blue-300 text-xs font-bold px-4 py-2 rounded-full shadow-lg border border-white/20">
-                                            {{ $post->category->name }}
-                                        </span>
-                                    </div>
+                    <article class="group relative flex flex-col h-full bg-white dark:bg-gray-800 rounded-3xl shadow-sm hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 dark:border-gray-700" 
+                             data-aos="fade-up" data-aos-delay="{{ $index * 100 }}">
+                        
+                        <!-- Image -->
+                        <div class="h-64 overflow-hidden relative">
+                            @if($post->image_path)
+                                <img src="{{ asset('storage/' . $post->image_path) }}" alt="{{ $post->title }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                            @else
+                                <div class="w-full h-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-400">
+                                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                 </div>
-                                
-                                <!-- Contenu -->
-                                <div class="p-10 flex-1">
-                                    <!-- Métadonnées élégantes -->
-                                    <div class="flex items-center gap-4 text-xs font-medium text-gray-500 dark:text-gray-400 mb-6">
-                                        <div class="flex items-center gap-2">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                            {{ $post->created_at->format('d M Y') }}
-                                        </div>
-                                        <div class="flex items-center gap-2">
-                                            <div class="h-1 w-1 rounded-full bg-gray-300"></div>
-                                            <span class="flex items-center gap-1">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                                                {{ $post->user->name }}
-                                            </span>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Titre -->
-                                    <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-6 group-hover:text-kamina-blue dark:group-hover:text-blue-400 transition-colors">
-                                        <a href="{{ route('news.show', $post->slug) }}" class="hover:no-underline">
-                                            {{ $post->title }}
-                                        </a>
-                                    </h3>
-                                    
-                                    <!-- Extrait -->
-                                    <p class="text-gray-600 dark:text-gray-300 text-lg leading-relaxed mb-8 line-clamp-3">
-                                        {{ $post->excerpt ?? Str::limit(strip_tags($post->body), 160) }}
-                                    </p>
-                                    
-                                    <!-- Lire la suite -->
-                                    <div class="flex items-center justify-between pt-6 border-t border-gray-100 dark:border-gray-700">
-                                        <a href="{{ route('news.show', $post->slug) }}" 
-                                           class="group/link inline-flex items-center gap-2 text-kamina-blue dark:text-blue-400 font-semibold hover:text-kamina-gold dark:hover:text-yellow-400 transition-colors">
-                                            Lire l'article complet
-                                            <svg class="w-5 h-5 transform group-hover/link:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                                        </a>
-                                        <span class="text-xs text-gray-400">Temps de lecture : 5 min</span>
-                                    </div>
-                                </div>
+                            @endif
+                            <div class="absolute top-4 left-4">
+                                <span class="bg-white/90 dark:bg-gray-900/90 backdrop-blur text-kamina-blue dark:text-blue-300 text-xs font-bold px-3 py-1.5 rounded-lg shadow-md border border-white/20">
+                                    {{ $post->category->name }}
+                                </span>
                             </div>
-                        </article>
-                    @else
-                        <!-- ARTICLES SECONDAIRES (PETITS) -->
-                        <article class="lg:col-span-5 group relative bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 overflow-hidden border border-gray-100 dark:border-gray-700" 
-                                 data-aos="fade-up" data-aos-delay="{{ $index * 100 }}">
-                            <div class="flex h-full">
-                                <!-- Image -->
-                                <div class="w-2/5 relative overflow-hidden">
-                                    @if($post->image_path)
-                                        <img src="{{ asset('storage/' . $post->image_path) }}" alt="{{ $post->title }}" 
-                                             class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
-                                    @else
-                                        <div class="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center">
-                                            <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                        </div>
-                                    @endif
-                                </div>
-                                
-                                <!-- Contenu -->
-                                <div class="w-3/5 p-6 flex flex-col">
-                                    <!-- Catégorie -->
-                                    <span class="text-xs font-bold text-kamina-blue dark:text-blue-300 uppercase tracking-wider mb-2">
-                                        {{ $post->category->name }}
-                                    </span>
-                                    
-                                    <!-- Titre -->
-                                    <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-3 group-hover:text-kamina-blue dark:group-hover:text-blue-400 transition-colors line-clamp-2">
-                                        <a href="{{ route('news.show', $post->slug) }}">
-                                            {{ $post->title }}
-                                        </a>
-                                    </h4>
-                                    
-                                    <!-- Date -->
-                                    <div class="text-xs text-gray-500 dark:text-gray-400 mb-4 flex items-center gap-1">
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                        {{ $post->created_at->format('d M Y') }}
-                                    </div>
-                                    
-                                    <!-- Bouton Lire -->
-                                    <div class="mt-auto pt-4 border-t border-gray-100 dark:border-gray-700">
-                                        <a href="{{ route('news.show', $post->slug) }}" 
-                                           class="text-sm font-medium text-kamina-blue dark:text-blue-400 hover:text-kamina-gold dark:hover:text-yellow-400 transition-colors flex items-center gap-1">
-                                            Lire l'article
-                                            <svg class="w-4 h-4 transform group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </article>
-                    @endif
-                @empty
-                    <div class="col-span-12 text-center py-20">
-                        <div class="inline-block p-6 rounded-2xl bg-white dark:bg-gray-800 shadow-lg mb-6">
-                            <svg class="w-12 h-12 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
                         </div>
-                        <h3 class="text-xl font-semibold text-gray-500 dark:text-gray-400 mb-2">Aucune actualité récente</h3>
-                        <p class="text-gray-400 dark:text-gray-500">Les nouvelles publications apparaîtront ici.</p>
+                        
+                        <!-- Contenu -->
+                        <div class="p-8 flex-1 flex flex-col relative">
+                            <!-- Date en petit -->
+                            <div class="flex items-center gap-2 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                                {{ $post->created_at->format('d M Y') }}
+                            </div>
+                            
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 group-hover:text-kamina-blue dark:group-hover:text-kamina-gold transition-colors line-clamp-2">
+                                <a href="{{ route('news.show', $post->slug) }}" class="focus:outline-none">
+                                    <span class="absolute inset-0"></span>
+                                    {{ $post->title }}
+                                </a>
+                            </h3>
+                            
+                            <p class="text-slate-500 dark:text-gray-400 text-sm leading-relaxed line-clamp-3 mb-6 flex-1">
+                                {{ $post->excerpt ?? Str::limit(strip_tags($post->body), 110) }}
+                            </p>
+                            
+                            <div class="flex items-center justify-between pt-6 border-t border-gray-100 dark:border-gray-700">
+                                <div class="flex items-center gap-2">
+                                    <div class="h-8 w-8 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-xs font-bold text-gray-600 dark:text-gray-300">
+                                        {{ substr($post->user->name, 0, 1) }}
+                                    </div>
+                                    <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">{{ $post->user->name }}</span>
+                                </div>
+                                <span class="text-kamina-blue dark:text-kamina-gold text-sm font-bold group-hover:translate-x-1 transition-transform">
+                                    Lire <span class="sr-only">l'article</span> →
+                                </span>
+                            </div>
+                        </div>
+                    </article>
+                @empty
+                    <div class="col-span-3 text-center py-20">
+                        <div class="inline-block p-4 rounded-full bg-white dark:bg-gray-800 shadow-sm mb-4 text-gray-400">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
+                        </div>
+                        <p class="text-gray-500 dark:text-gray-400 text-lg">Aucune actualité récente.</p>
                     </div>
                 @endforelse
             </div>
             
-            <!-- BOUTON MOBILE -->
-            <div class="mt-16 text-center lg:hidden">
-                <a href="{{ route('news.index') }}" class="inline-block px-10 py-3.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-semibold rounded-full hover:border-kamina-blue hover:text-kamina-blue transition-all shadow-sm">
+            <div class="mt-12 text-center md:hidden">
+                <a href="{{ route('news.index') }}" class="inline-block px-8 py-3 bg-white border border-gray-200 text-kamina-blue font-bold rounded-full shadow-sm">
                     Voir le blog
                 </a>
             </div>
@@ -305,7 +229,7 @@
     </section>
 
     <!-- ========================================================= -->
-    <!-- 4. VIE DU DIOCÈSE - DISPOSITION INTERACTIVE -->
+    <!-- 4. BANNIÈRE SERVICES (Accès Rapides Modernisés) -->
     <!-- ========================================================= -->
     <section class="py-24 bg-gradient-to-br from-kamina-blue via-blue-800 to-blue-900 dark:from-gray-900 dark:via-blue-950 dark:to-blue-900 relative overflow-hidden">
         <!-- Éléments décoratifs -->

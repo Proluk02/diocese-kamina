@@ -3,7 +3,10 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 
-// --- IMPORTS COMPOSANTS ADMIN (Back-Office) ---
+// --- IMPORT DU MIDDLEWARE DE SÉCURITÉ ---
+use App\Http\Middleware\EnsureUserIsActive;
+
+// --- IMPORTS COMPOSANTS ADMIN ---
 use App\Livewire\Admin\Articles\ArticleIndex;
 use App\Livewire\Admin\Categories\CategoryIndex;
 use App\Livewire\Admin\Documents\DocumentIndex;
@@ -12,7 +15,7 @@ use App\Livewire\Admin\Users\UserIndex;
 use App\Livewire\Admin\Songs\SongIndex;
 use App\Livewire\Admin\Settings\SettingsIndex;
 
-// --- IMPORTS COMPOSANTS PUBLIC (Site Vitrine) ---
+// --- IMPORTS COMPOSANTS PUBLIC ---
 use App\Livewire\Public\Home;
 use App\Livewire\Public\News\ArticleList;
 use App\Livewire\Public\News\ArticleShow;
@@ -27,25 +30,20 @@ use App\Livewire\Public\Donation;
 
 /*
 |--------------------------------------------------------------------------
-| ROUTES PUBLIQUES (Accessibles à tous)
+| ROUTES PUBLIQUES
 |--------------------------------------------------------------------------
 */
 
-// 1. PAGE D'ACCUEIL
 Route::get('/', Home::class)->name('home');
 
-// 2. ACTUALITÉS
 Route::get('/actualites', ArticleList::class)->name('news.index');
 Route::get('/actualites/{slug}', ArticleShow::class)->name('news.show');
 
-// 3. INSTITUTIONNEL & RESSOURCES (Module A)
 Route::get('/presentation', Presentation::class)->name('presentation');
 Route::get('/documents', DocumentList::class)->name('documents.public.index');
 Route::get('/documents/{id}', DocumentShow::class)->name('documents.public.show');
 Route::get('/contact', Contact::class)->name('contact');
 
-// 4. MODULE B (Placeholders en attendant le développement)
-// Ces routes permettent aux liens du menu de fonctionner sans erreur 404
 Route::get('/paroisses', ParishList::class)->name('parishes.public.index');
 Route::get('/paroisses/{id}', ParishDetail::class)->name('parishes.public.show');
 Route::get('/liturgie', SongLibrary::class)->name('liturgy.public.index');
@@ -53,19 +51,22 @@ Route::get('/don', Donation::class)->name('donation');
 
 /*
 |--------------------------------------------------------------------------
-| ROUTES ADMIN (Protégées par auth)
+| ROUTES ADMIN (Protégées)
 |--------------------------------------------------------------------------
 */
 
-// Tableau de bord principal
 Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth', 'verified', EnsureUserIsActive::class]) // Sécurité active ajoutée
     ->name('dashboard');
 
 // Groupe Administration
-Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
+// Le middleware EnsureUserIsActive bloque les utilisateurs dont is_active = false (ex: musiciens en attente)
+Route::middleware(['auth', 'verified', EnsureUserIsActive::class])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
     
-    // Gestion de Contenu
+    // Contenu (Tout le monde peut voir, les permissions gèrent l'écriture)
     Route::get('/articles', ArticleIndex::class)->name('articles.index');
     Route::get('/categories', CategoryIndex::class)->name('categories.index');
     Route::get('/documents', DocumentIndex::class)->name('documents.index');
@@ -74,16 +75,14 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::get('/parishes', ParishIndex::class)->name('parishes.index');
     Route::get('/songs', SongIndex::class)->name('songs.index');
 
-    // Administration Système
+    // Administration Système (À protéger via Gate dans le composant)
     Route::get('/users', UserIndex::class)->name('users.index');
-
-    // Paramètres (Page placeholder en attendant le développement)
     Route::get('/settings', SettingsIndex::class)->name('settings.index');
 });
 
 /*
 |--------------------------------------------------------------------------
-| GESTION DU PROFIL UTILISATEUR
+| PROFIL
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->group(function () {

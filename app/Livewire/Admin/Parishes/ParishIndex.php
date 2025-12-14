@@ -7,6 +7,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 class ParishIndex extends Component
 {
@@ -16,24 +17,22 @@ class ParishIndex extends Component
     public $isOpen = false;
     public $mode = 'create';
 
-    // Champs
     public $parishId;
     public $name;
     public $city = 'Kamina';
     public $address;
     public $contact_phone;
     
-    // Coordonnées GPS (Nouveaux champs)
+    // GPS
     public $latitude;
     public $longitude;
     
-    // Rich Texts (Initialisation explicite à vide pour éviter le bug NULL)
+    // Rich Text (Initialisé vide)
     public $history = ''; 
     public $mass_schedules = ''; 
     
     public $photo;
     public $oldPhoto;
-    
     public $currentParish;
 
     protected function rules()
@@ -43,7 +42,6 @@ class ParishIndex extends Component
             'city' => 'required',
             'address' => 'nullable|string',
             'contact_phone' => 'nullable|string',
-            // Validation numérique pour GPS
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',
             'history' => 'nullable|string',
@@ -56,6 +54,10 @@ class ParishIndex extends Component
 
     public function create()
     {
+        // Seul l'admin peut créer une paroisse
+        if (!auth()->user()->isAdmin()) {
+            abort(403, 'Action non autorisée.');
+        }
         $this->resetInputFields();
         $this->mode = 'create';
         $this->isOpen = true;
@@ -63,21 +65,22 @@ class ParishIndex extends Component
 
     public function edit($id)
     {
+        // Vérification permission (Si prêtre, doit être SA paroisse)
+        $user = auth()->user();
+        if (!$user->isAdmin() && $user->parish_id != $id) {
+            abort(403, 'Vous ne pouvez modifier que votre paroisse.');
+        }
+
         $parish = Parish::findOrFail($id);
         $this->parishId = $id;
         $this->name = $parish->name;
         $this->city = $parish->city;
         $this->address = $parish->address;
         $this->contact_phone = $parish->contact_phone;
-        
-        // Récupération GPS
         $this->latitude = $parish->latitude;
         $this->longitude = $parish->longitude;
-        
-        // Gestion des NULLs pour Rich Text (Sécurité)
         $this->history = $parish->history ?? '';
         $this->mass_schedules = $parish->mass_schedules ?? '';
-        
         $this->oldPhoto = $parish->photo_path;
         
         $this->mode = 'edit';
@@ -100,9 +103,8 @@ class ParishIndex extends Component
             'city' => $this->city,
             'address' => $this->address,
             'contact_phone' => $this->contact_phone,
-            'latitude' => $this->latitude,   // Enregistrement Lat
-            'longitude' => $this->longitude, // Enregistrement Long
-            // On force le string vide si null
+            'latitude' => $this->latitude,
+            'longitude' => $this->longitude,
             'history' => $this->history ?? '',
             'mass_schedules' => $this->mass_schedules ?? '',
         ];
@@ -127,6 +129,8 @@ class ParishIndex extends Component
 
     public function delete($id)
     {
+        if (!auth()->user()->isAdmin()) abort(403); // Seul l'admin supprime
+
         $parish = Parish::findOrFail($id);
         if ($parish->photo_path) Storage::disk('public')->delete($parish->photo_path);
         $parish->delete();
@@ -142,7 +146,6 @@ class ParishIndex extends Component
 
     private function resetInputFields()
     {
-        // Reset complet
         $this->reset(['name', 'city', 'address', 'contact_phone', 'latitude', 'longitude', 'photo', 'oldPhoto', 'parishId', 'currentParish']);
         $this->history = '';
         $this->mass_schedules = '';
@@ -151,11 +154,13 @@ class ParishIndex extends Component
 
     public function render()
     {
+        $query = Parish::query();
+        if (!auth()->user()->isAdmin()) {
+            $query->where('id', auth()->user()->parish_id);
+        }
+
         return view('livewire.admin.parishes.parish-index', [
-            'parishes' => Parish::where('name', 'like', '%'.$this->search.'%')
-                ->orWhere('city', 'like', '%'.$this->search.'%')
-                ->latest()
-                ->paginate(10)
+            'parishes' => $query->latest()->paginate(10)
         ])->layout('layouts.app');
     }
 }

@@ -87,4 +87,32 @@
             {{ $parishes->links() }}
         </div>
     </div>
+        <!-- CARTE INTERACTIVE -->
+    <div class="mb-16 rounded-3xl overflow-hidden shadow-xl border border-gray-200 dark:border-gray-700 h-[500px] relative z-0"
+        x-data="{
+            initMap() {
+                // Centre sur Kamina (Coordonnées approximatives, à ajuster)
+                var map = L.map('map').setView([-8.7386, 24.9906], 13);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; OpenStreetMap contributors'
+                }).addTo(map);
+
+                // Données des paroisses injectées depuis PHP
+                var parishes = {{ Js::from($parishes->items()) }};
+
+                parishes.forEach(parish => {
+                    if(parish.latitude && parish.longitude) {
+                        L.marker([parish.latitude, parish.longitude])
+                        .addTo(map)
+                        .bindPopup(`<b>${parish.name}</b><br>${parish.address}<br><a href='/paroisses/${parish.id}'>Voir détails</a>`);
+                    }
+                });
+            }
+        }"
+        x-init="initMap()"
+        wire:ignore> <!-- wire:ignore pour que Livewire ne recharge pas la carte -->
+        
+        <div id="map" class="w-full h-full z-0"></div>
+    </div>
 </div>
