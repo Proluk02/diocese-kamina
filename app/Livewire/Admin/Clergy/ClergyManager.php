@@ -15,7 +15,7 @@ class ClergyManager extends Component
 {
     use WithPagination, WithFileUploads;
 
-    public $tab = 'active'; // 'active' (Prêtres), 'necrology' (Décès)
+    public $tab = 'active'; 
     public $search = '';
     public $isOpen = false;
     
@@ -27,9 +27,11 @@ class ClergyManager extends Component
     public $transfer_date;
 
     // --- NÉCROLOGIE ---
-    public $necroId, $necroName, $necroTitle, $necroDate, $necroBio, $necroPhoto;
+    public $necroUserId; 
+    public $necroDate;
+    public $necroBio;
+    public $necroPhoto;
 
-    // Règles
     protected $rules = [
         'new_parish_id' => 'required|exists:parishes,id',
         'new_function' => 'required|string',
@@ -38,12 +40,11 @@ class ClergyManager extends Component
 
     public function mount() { $this->transfer_date = date('Y-m-d'); }
 
-    // --- GESTION DES MUTATIONS ---
-    
+    // --- MUTATIONS ---
     public function openTransferModal($priestId)
     {
         $this->selectedPriest = User::findOrFail($priestId);
-        $this->new_parish_id = $this->selectedPriest->parish_id; // Par défaut actuel
+        $this->new_parish_id = $this->selectedPriest->parish_id;
         $this->isTransferModalOpen = true;
     }
 
@@ -52,12 +53,10 @@ class ClergyManager extends Component
         $this->validate();
 
         DB::transaction(function () {
-            // 1. Clôturer l'assignation actuelle (Historique)
             Assignment::where('user_id', $this->selectedPriest->id)
                       ->where('is_current', true)
                       ->update(['is_current' => false, 'end_date' => $this->transfer_date]);
 
-            // 2. Créer la nouvelle assignation (Historique)
             Assignment::create([
                 'user_id' => $this->selectedPriest->id,
                 'parish_id' => $this->new_parish_id,
@@ -66,51 +65,85 @@ class ClergyManager extends Component
                 'is_current' => true
             ]);
 
-            // 3. Mettre à jour l'utilisateur (C'est ça qui change ses droits d'accès !)
-            $this->selectedPriest->update([
-                'parish_id' => $this->new_parish_id
-            ]);
+            $this->selectedPriest->update(['parish_id' => $this->new_parish_id]);
         });
 
-        session()->flash('success', 'Mutation effectuée. Les droits d\'accès ont été mis à jour.');
+        session()->flash('success', 'Mutation effectuée.');
         $this->isTransferModalOpen = false;
     }
 
-    // --- GESTION NÉCROLOGIE ---
+    // --- NÉCROLOGIE ---
     
     public function saveNecrology()
     {
-        $data = $this->validate([
-            'necroName' => 'required',
-            'necroTitle' => 'required',
+        $this->validate([
+            'necroUserId' => 'required|exists:users,id',
             'necroDate' => 'required|date',
             'necroBio' => 'nullable',
             'necroPhoto' => 'nullable|image|max:2048'
         ]);
 
-        if ($this->necroPhoto) {
-            $data['photo_path'] = $this->necroPhoto->store('necrology', 'public');
-        }
+        DB::transaction(function () {
+            $priest = User::findOrFail($this->necroUserId);
 
-        Necrology::create([
-            'name' => $this->necroName,
-            'title' => $this->necroTitle,
-            'death_date' => $this->necroDate,
-            'biography' => $this->necroBio,
-            'photo_path' => $data['photo_path'] ?? null
-        ]);
+            $data = [
+                'user_id' => $priest->id,
+                'name' => $priest->name,
+                'title' => $priest->role === 'bishop' ? 'Monseigneur' : 'Abbé',
+                'death_date' => $this->necroDate,
+                'biography' => $this->necroBio,
+            ];
 
-        session()->flash('success', 'Nécrologie ajoutée.');
+            if ($this->necroPhoto) {
+                $data['photo_path'] = $this->necroPhoto->store('necrology', 'public');
+            }
+
+            Necrology::create($data);
+
+            $priest->update([
+                'is_active' => false,
+                'parish_id' => null
+            ]);
+
+            Assignment::where('user_id', $priest->id)
+                      ->where('is_current', true)
+                      ->update([
+                          'is_current' => false, 
+                          'end_date' => $this->necroDate
+                      ]);
+        });
+
+        session()->flash('success', 'Décès enregistré.');
         $this->isOpen = false;
+        $this->reset(['necroUserId', 'necroDate', 'necroBio', 'necroPhoto']);
+    }
+    
+    public function deleteNecrology($id)
+    {
+        $necro = Necrology::findOrFail($id);
+        $necro->delete();
+        session()->flash('success', 'Entrée supprimée.');
     }
 
     public function render()
     {
+        // On sépare la logique pour éviter l'erreur si la relation n'existe pas encore
+        // On récupère d'abord les IDs des utilisateurs déjà décédés
+        $deceasedUserIds = Necrology::pluck('user_id')->toArray();
+
         return view('livewire.admin.clergy.clergy-manager', [
             'priests' => User::whereIn('role', ['priest', 'bishop'])
+                             ->where('is_active', true)
                              ->where('name', 'like', '%'.$this->search.'%')
                              ->with('parish')
                              ->paginate(10),
+            
+            // On filtre manuellement avec whereNotIn au lieu de whereDoesntHave pour éviter le bug de relation
+            'allPriests' => User::whereIn('role', ['priest', 'bishop'])
+                                ->whereNotIn('id', $deceasedUserIds)
+                                ->orderBy('name')
+                                ->get(),
+
             'necrologies' => Necrology::latest()->get(),
             'parishes' => Parish::orderBy('name')->get()
         ])->layout('layouts.app');
