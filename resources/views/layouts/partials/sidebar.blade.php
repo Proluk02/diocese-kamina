@@ -94,10 +94,20 @@
                 <h3 class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2" x-show="sidebarExpanded">
                     Administration
                 </h3>
+                
+                <!-- Gestion Clergé (NOUVEAU) -->
+                <a href="{{ route('admin.clergy.index') }}" wire:navigate
+                   class="group flex items-center gap-3 rounded-xl px-3 py-2.5 font-medium transition-all duration-200 {{ request()->routeIs('admin.clergy.*') ? 'bg-white/10 text-white shadow-lg' : 'text-gray-400 hover:bg-white/5 hover:text-white' }}">
+                    <!-- Icone Croix/Pasteur -->
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                    <span x-show="sidebarExpanded" class="whitespace-nowrap">Clergé & Nécrologie</span>
+                </a>
+
+                <!-- Gestion Utilisateurs -->
                 <a href="{{ route('admin.users.index') }}" wire:navigate
                    class="group flex items-center gap-3 rounded-xl px-3 py-2.5 font-medium transition-all duration-200 {{ request()->routeIs('admin.users.*') ? 'bg-white/10 text-white shadow-lg' : 'text-gray-400 hover:bg-white/5 hover:text-white' }}">
-                    <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
-                    <span x-show="sidebarExpanded" class="whitespace-nowrap">Utilisateurs</span>
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                    <span x-show="sidebarExpanded" class="whitespace-nowrap">Tous les Utilisateurs</span>
                 </a>
             </div>
             @endif

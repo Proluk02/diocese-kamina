@@ -11,27 +11,44 @@ class SongLibrary extends Component
     use WithPagination;
 
     public $search = '';
-    public $moment = '';
+    
+    // Filtres multiples
+    public $filterMoment = '';
+    public $filterSeason = '';
+    public $filterTheme = '';
 
-    public $moments = [
-        'Entrée', 'Kyrie', 'Gloria', 'Méditation', 'Acclamation', 
-        'Credo', 'Prière Universelle', 'Offertoire', 'Sanctus', 
-        'Agnus Dei', 'Communion', 'Action de grâce', 'Sortie', 'Louange'
-    ];
+    // Constantes
+    public $moments = Song::MOMENTS;
+    public $seasons = Song::SEASONS;
+    public $themes = Song::THEMES;
 
-    public function filterByMoment($m)
+    public function updatedSearch() { $this->resetPage(); }
+    public function updatedFilterMoment() { $this->resetPage(); }
+    public function updatedFilterSeason() { $this->resetPage(); }
+    public function updatedFilterTheme() { $this->resetPage(); }
+
+    public function resetFilters()
     {
-        $this->moment = ($this->moment === $m) ? '' : $m; // Toggle
-        $this->resetPage();
+        $this->reset(['filterMoment', 'filterSeason', 'filterTheme', 'search']);
     }
+
+    // Helpers pour la vue (filtre rapide)
+    public function filterByMoment($m) { $this->filterMoment = ($this->filterMoment === $m) ? '' : $m; $this->resetPage(); }
+    public function filterBySeason($s) { $this->filterSeason = ($this->filterSeason === $s) ? '' : $s; $this->resetPage(); }
+    public function filterByTheme($t) { $this->filterTheme = ($this->filterTheme === $t) ? '' : $t; $this->resetPage(); }
 
     public function render()
     {
         $songs = Song::where('is_approved', true)
-            ->when($this->search, fn($q) => $q->where('title', 'like', '%'.$this->search.'%'))
-            ->when($this->moment, fn($q) => $q->where('liturgical_moment', $this->moment))
+            ->where(function($query) {
+                $query->where('title', 'like', '%'.$this->search.'%')
+                      ->orWhere('composer', 'like', '%'.$this->search.'%');
+            })
+            ->when($this->filterMoment, fn($q) => $q->where('liturgical_moment', $this->filterMoment))
+            ->when($this->filterSeason, fn($q) => $q->where('liturgical_season', $this->filterSeason))
+            ->when($this->filterTheme, fn($q) => $q->where('theme', $this->filterTheme))
             ->latest()
-            ->paginate(20);
+            ->paginate(15);
 
         return view('livewire.public.liturgy.song-library', [
             'songs' => $songs

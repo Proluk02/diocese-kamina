@@ -12,13 +12,16 @@ class Song extends Model
     use HasFactory;
 
     protected $fillable = [
-        'title',
-        'composer',
-        'audio_path',
-        'score_path',       // Partition
+        'title', 
+        'composer', 
+        'composer_description', // Nouveau
+        'audio_path', 
+        'score_path',
         'lyrics',
-        'liturgical_moment', // Entrée, Kyrie, Gloria...
-        'user_id',
+        'liturgical_moment', 
+        'liturgical_season',    // Nouveau
+        'theme',                // Nouveau
+        'user_id', 
         'is_approved',
     ];
 
@@ -26,22 +29,30 @@ class Song extends Model
         'is_approved' => 'boolean',
     ];
 
-    /* -----------------------------------------------------------------
-     |  RELATIONS
-     | -----------------------------------------------------------------
-     */
+    // CONSTANTES POUR LES LISTES DÉROULANTES
+    public const MOMENTS = [
+        'Entrée', 'Antienne d\'ouverture', 'Kyrie', 'Gloria', 
+        'Psaume', 'Acclamation', 'Prière Universelle', 'Credo',
+        'Offertoire', 'Sanctus', 'Agnus Dei', 'Communion', 
+        'Action de grâce', 'Envoi', 'Méditation', 'Procession'
+    ];
+
+    public const SEASONS = [
+        'Temps Ordinaire', 'Avent', 'Noël', 'Carême', 
+        'Semaine Sainte', 'Pâques', 'Ascension', 'Pentecôte'
+    ];
+
+    public const THEMES = [
+        'Vierge Marie', 'Saints & Martyrs', 'Sacré-Cœur', 'Esprit Saint',
+        'Adoration', 'Louange', 'Mariage', 'Funérailles', 
+        'Vocation', 'Paix & Justice'
+    ];
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    /* -----------------------------------------------------------------
-     |  SCOPES
-     | -----------------------------------------------------------------
-     */
-
-    // Pour afficher uniquement les chants validés sur le site public
     public function scopeApproved(Builder $query): void
     {
         $query->where('is_approved', true);

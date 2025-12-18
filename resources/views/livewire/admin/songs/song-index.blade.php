@@ -89,14 +89,14 @@
         <div class="px-6 py-4 bg-gray-50 dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700">{{ $songs->links() }}</div>
     </div>
 
-    <!-- MODALE -->
+    <!-- MODALE UNIQUE -->
     @if($isOpen)
     <div class="fixed inset-0 z-[999] overflow-y-auto">
         <div class="fixed inset-0 bg-gray-900/75 backdrop-blur-sm transition-opacity"></div>
         <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-6">
-            <div class="relative transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 text-left shadow-2xl transition-all sm:w-full sm:max-w-2xl border border-gray-100 dark:border-gray-700 flex flex-col max-h-[90vh]">
+            <div class="relative transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 text-left shadow-2xl transition-all sm:w-full sm:max-w-3xl border border-gray-100 dark:border-gray-700 flex flex-col max-h-[90vh]">
                 
-                <!-- HEADER -->
+                <!-- HEADER MODALE -->
                 <div class="bg-white dark:bg-gray-800 px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center shrink-0">
                     <h3 class="text-xl font-bold text-gray-900 dark:text-white">
                         {{ $mode === 'show' ? 'Détails du Chant' : ($mode === 'edit' ? 'Modifier Chant' : 'Nouveau Chant') }}
@@ -104,21 +104,34 @@
                     <button wire:click="closeModal" class="text-gray-400 hover:text-gray-500 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
                 </div>
 
-                <!-- CORPS -->
+                <!-- CORPS MODALE -->
                 <div class="px-6 py-6 overflow-y-auto custom-scrollbar">
                     
+                    <!-- ================= MODE SHOW ================= -->
                     @if($mode === 'show' && $currentSong)
                         <div class="space-y-6">
-                            <!-- Info -->
+                            <!-- En-tête -->
                             <div class="text-center">
+                                <span class="inline-block px-3 py-1 rounded-full bg-kamina-blue/10 text-kamina-blue dark:text-blue-300 text-xs font-bold uppercase tracking-wide mb-2">
+                                    {{ $currentSong->liturgical_moment }}
+                                </span>
                                 <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $currentSong->title }}</h2>
-                                <p class="text-gray-500 dark:text-gray-400">{{ $currentSong->composer }} • {{ $currentSong->liturgical_moment }}</p>
+                                <p class="text-kamina-gold font-medium">{{ $currentSong->composer ?? 'Compositeur Inconnu' }}</p>
+                            </div>
+
+                            <div class="flex flex-wrap justify-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                                @if($currentSong->liturgical_season)
+                                    <span class="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-lg">{{ $currentSong->liturgical_season }}</span>
+                                @endif
+                                @if($currentSong->theme)
+                                    <span class="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-lg">{{ $currentSong->theme }}</span>
+                                @endif
                             </div>
 
                             <!-- Audio Player -->
                             @if($currentSong->audio_path)
-                                <div class="bg-gray-50 dark:bg-gray-700/30 p-4 rounded-xl flex flex-col items-center">
-                                    <p class="text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300">Écouter</p>
+                                <div class="bg-gray-50 dark:bg-gray-700/30 p-4 rounded-xl flex flex-col items-center border border-gray-100 dark:border-gray-700">
+                                    <p class="text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300">Écouter l'enregistrement</p>
                                     <audio controls class="w-full">
                                         <source src="{{ asset('storage/'.$currentSong->audio_path) }}" type="audio/mpeg">
                                         Votre navigateur ne supporte pas l'audio.
@@ -135,26 +148,38 @@
                                         </div>
                                         <div>
                                             <h4 class="font-bold text-gray-900 dark:text-white">Partition Disponible</h4>
-                                            <p class="text-xs text-red-600 dark:text-red-300">Format PDF / Image</p>
+                                            <p class="text-xs text-red-600 dark:text-red-300">PDF / Image</p>
                                         </div>
                                     </div>
-                                    <a href="{{ asset('storage/'.$currentSong->score_path) }}" target="_blank" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-semibold transition">Télécharger</a>
+                                    <a href="{{ asset('storage/'.$currentSong->score_path) }}" target="_blank" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-semibold transition shadow-md">
+                                        Télécharger
+                                    </a>
                                 </div>
                             @endif
 
                             <!-- Paroles -->
                             @if(!empty($currentSong->lyrics))
-                                <div class="bg-gray-50 dark:bg-gray-900/30 p-6 rounded-xl border border-gray-100 dark:border-gray-700 text-center">
+                                <div class="bg-gray-50 dark:bg-gray-900/50 p-6 rounded-xl border border-gray-100 dark:border-gray-700 text-center">
                                     <h4 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Paroles</h4>
-                                    <div class="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300">
+                                    <div class="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300 ql-editor">
                                         {!! $currentSong->lyrics !!}
                                     </div>
                                 </div>
                             @endif
+
+                            <!-- Bio Compositeur -->
+                            @if(!empty($currentSong->composer_description))
+                                <div class="pt-6 border-t border-gray-100 dark:border-gray-700">
+                                    <h4 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Note sur le compositeur</h4>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400 italic">{{ $currentSong->composer_description }}</p>
+                                </div>
+                            @endif
                         </div>
 
+                    <!-- ================= MODE CREATE / EDIT ================= -->
                     @else
-                        <div class="space-y-5">
+                        <div class="space-y-6">
+                            <!-- Titre & Compositeur -->
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Titre du chant</label>
@@ -167,15 +192,33 @@
                                 </div>
                             </div>
 
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Moment Liturgique</label>
-                                <select wire:model="liturgical_moment" class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm focus:ring-kamina-gold focus:border-kamina-gold p-2.5">
-                                    <option value="">Choisir...</option>
-                                    @foreach($moments as $moment) <option value="{{ $moment }}">{{ $moment }}</option> @endforeach
-                                </select>
-                                @error('liturgical_moment') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                            <!-- Catégorisation -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Moment Liturgique</label>
+                                    <select wire:model="liturgical_moment" class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm focus:ring-kamina-gold focus:border-kamina-gold p-2.5">
+                                        <option value="">Choisir...</option>
+                                        @foreach($moments as $moment) <option value="{{ $moment }}">{{ $moment }}</option> @endforeach
+                                    </select>
+                                    @error('liturgical_moment') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Saison (Optionnel)</label>
+                                    <select wire:model="liturgical_season" class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm focus:ring-kamina-gold focus:border-kamina-gold p-2.5">
+                                        <option value="">Toutes saisons</option>
+                                        @foreach($seasons as $s) <option value="{{ $s }}">{{ $s }}</option> @endforeach
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Thème (Optionnel)</label>
+                                    <select wire:model="theme" class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm focus:ring-kamina-gold focus:border-kamina-gold p-2.5">
+                                        <option value="">Aucun</option>
+                                        @foreach($themes as $t) <option value="{{ $t }}">{{ $t }}</option> @endforeach
+                                    </select>
+                                </div>
                             </div>
 
+                            <!-- Fichiers -->
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <!-- Upload Audio -->
                                 <div class="bg-blue-50 dark:bg-blue-900/10 p-4 rounded-lg border border-dashed border-blue-300 dark:border-blue-700">
@@ -194,18 +237,23 @@
                                 </div>
                             </div>
 
-                            <!-- Paroles (Rich Text) -->
+                            <!-- Paroles -->
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Paroles</label>
                                 <x-rich-text wire:model="lyrics" />
                             </div>
 
-                            <!-- Validation Toggle -->
-                            <div class="flex items-center">
+                            <!-- Bio Compositeur -->
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Note sur le compositeur (Optionnel)</label>
+                                <textarea wire:model="composer_description" rows="2" class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm focus:ring-kamina-gold focus:border-kamina-gold p-2.5"></textarea>
+                            </div>
+
+                            <!-- Validation -->
+                            <div class="flex items-center p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                                 <label class="flex items-center cursor-pointer">
-                                    <input type="checkbox" wire:model="is_approved" class="sr-only peer">
-                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-500"></div>
-                                    <span class="ml-3 text-sm font-medium text-gray-900 dark:text-white">Approuver immédiatement</span>
+                                    <input type="checkbox" wire:model="is_approved" class="w-5 h-5 text-kamina-blue rounded focus:ring-kamina-gold border-gray-300">
+                                    <span class="ml-3 text-sm font-medium text-gray-900 dark:text-white">Approuver et publier immédiatement</span>
                                 </label>
                             </div>
                         </div>

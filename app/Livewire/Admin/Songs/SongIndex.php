@@ -14,7 +14,7 @@ class SongIndex extends Component
     use WithPagination, WithFileUploads;
 
     public $search = '';
-    public $filterStatus = ''; // 'approved', 'pending'
+    public $filterStatus = ''; 
     public $isOpen = false;
     public $mode = 'create';
 
@@ -22,44 +22,47 @@ class SongIndex extends Component
     public $songId;
     public $title;
     public $composer;
-    public $liturgical_moment; // Entrée, Kyrie, etc.
-    public $lyrics = ''; // Rich Text
+    public $composer_description;
+    public $liturgical_moment;
+    public $liturgical_season;
+    public $theme;
+    
+    // IMPORTANT : Initialisation à chaîne vide
+    public $lyrics = ''; 
+    
     public $is_approved = false;
     
-    // Fichiers
     public $audioFile;
     public $oldAudio;
-    public $scoreFile; // Partition
+    public $scoreFile;
     public $oldScore;
-
     public $currentSong;
 
-    public $moments = [
-        'Entrée', 'Kyrie', 'Gloria', 'Méditation', 'Acclamation', 
-        'Credo', 'Prière Universelle', 'Offertoire', 'Sanctus', 
-        'Agnus Dei', 'Communion', 'Action de grâce', 'Sortie', 'Louange'
-    ];
+    // Constantes
+    public $moments = Song::MOMENTS;
+    public $seasons = Song::SEASONS;
+    public $themes = Song::THEMES;
 
     protected function rules()
     {
-        $rules = [
+        return [
             'title' => 'required|min:2',
             'composer' => 'nullable|string',
+            'composer_description' => 'nullable|string',
             'liturgical_moment' => 'required|string',
-            'lyrics' => 'nullable|string',
+            'liturgical_season' => 'nullable|string',
+            'theme' => 'nullable|string',
+            'lyrics' => 'nullable|string', // Nullable autorisé
             'is_approved' => 'boolean',
+            'audioFile' => 'nullable|file|mimes:mp3,wav,ogg|max:20480',
+            'scoreFile' => 'nullable|file|mimes:pdf,jpg,png|max:5120',
         ];
+    }
 
-        // Validation des fichiers seulement à la création ou si modifiés
-        if ($this->mode === 'create') {
-            $rules['audioFile'] = 'nullable|file|mimes:mp3,wav,ogg|max:20480'; // 20MB
-            $rules['scoreFile'] = 'nullable|file|mimes:pdf,jpg,png|max:5120'; // 5MB
-        } else {
-            $rules['audioFile'] = 'nullable|file|mimes:mp3,wav,ogg|max:20480';
-            $rules['scoreFile'] = 'nullable|file|mimes:pdf,jpg,png|max:5120';
-        }
-
-        return $rules;
+    // Sécurité au chargement
+    public function mount()
+    {
+        $this->lyrics = '';
     }
 
     public function updatedSearch() { $this->resetPage(); }
@@ -77,8 +80,14 @@ class SongIndex extends Component
         $this->songId = $id;
         $this->title = $song->title;
         $this->composer = $song->composer;
+        $this->composer_description = $song->composer_description;
         $this->liturgical_moment = $song->liturgical_moment;
+        $this->liturgical_season = $song->liturgical_season;
+        $this->theme = $song->theme;
+        
+        // On s'assure que lyrics est une string
         $this->lyrics = $song->lyrics ?? '';
+        
         $this->is_approved = (bool) $song->is_approved;
         $this->oldAudio = $song->audio_path;
         $this->oldScore = $song->score_path;
@@ -98,28 +107,28 @@ class SongIndex extends Component
     {
         $this->validate();
 
+        // Conversion explicite pour éviter le bug NULL
+        $lyricsContent = is_null($this->lyrics) ? '' : (string) $this->lyrics;
+
         $data = [
             'title' => $this->title,
             'composer' => $this->composer,
+            'composer_description' => $this->composer_description,
             'liturgical_moment' => $this->liturgical_moment,
-            'lyrics' => $this->lyrics ?? '',
+            'liturgical_season' => $this->liturgical_season,
+            'theme' => $this->theme,
+            'lyrics' => $lyricsContent, // Utilisation de la variable sécurisée
             'is_approved' => $this->is_approved,
             'user_id' => Auth::id(),
         ];
 
-        // Upload Audio
         if ($this->audioFile) {
-            if ($this->mode === 'edit' && $this->oldAudio) {
-                Storage::disk('public')->delete($this->oldAudio);
-            }
+            if ($this->mode === 'edit' && $this->oldAudio) Storage::disk('public')->delete($this->oldAudio);
             $data['audio_path'] = $this->audioFile->store('songs/audio', 'public');
         }
 
-        // Upload Partition
         if ($this->scoreFile) {
-            if ($this->mode === 'edit' && $this->oldScore) {
-                Storage::disk('public')->delete($this->oldScore);
-            }
+            if ($this->mode === 'edit' && $this->oldScore) Storage::disk('public')->delete($this->oldScore);
             $data['score_path'] = $this->scoreFile->store('songs/scores', 'public');
         }
 
@@ -159,9 +168,9 @@ class SongIndex extends Component
 
     private function resetInputFields()
     {
-        $this->reset(['title', 'composer', 'liturgical_moment', 'audioFile', 'scoreFile', 'oldAudio', 'oldScore', 'songId', 'currentSong']);
-        $this->lyrics = '';
-        $this->is_approved = true; // Par défaut validé si c'est l'admin qui crée
+        $this->reset(['title', 'composer', 'composer_description', 'liturgical_moment', 'liturgical_season', 'theme', 'audioFile', 'scoreFile', 'oldAudio', 'oldScore', 'songId', 'currentSong']);
+        $this->lyrics = ''; // Reset explicite
+        $this->is_approved = true;
         $this->resetErrorBag();
     }
 

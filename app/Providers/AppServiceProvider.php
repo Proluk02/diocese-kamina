@@ -22,27 +22,25 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Accès au Dashboard Admin Global
-        Gate::define('access-admin', function (User $user) {
-            return in_array($user->role, ['admin', 'bishop', 'secretary', 'priest', 'musician']);
-        });
-
-        // Super Admin (Peut tout faire)
+        // 1. SUPER ADMIN (Évêque, Chancelier, Com) : Accès TOUT
         Gate::define('manage-system', function (User $user) {
             return in_array($user->role, ['admin', 'bishop']);
         });
 
-        // Gestion des Paroisses (Seulement sa propre paroisse)
-        Gate::define('update-parish', function (User $user, Parish $parish) {
-            if ($user->role === 'admin' || $user->role === 'bishop') return true;
-            
-            // Si c'est un prêtre ou secrétaire, il doit être lié à la paroisse
-            return in_array($user->role, ['priest', 'secretary']) && $user->parish_id === $parish->id;
+        // 2. GESTION CLERGÉ (Affectations) : Réservé à l'Évêché
+        Gate::define('manage-clergy', function (User $user) {
+            return in_array($user->role, ['admin', 'bishop']);
         });
 
-        // Gestion Musique
-        Gate::define('manage-music', function (User $user) {
-            return in_array($user->role, ['admin', 'musician']);
+        // 3. GESTION PAROISSE (Strict)
+        // L'utilisateur peut modifier la paroisse SI :s
+        // - C'est un Admin
+        // - OU C'est le Curé/Secrétaire AFFECTÉ à cette paroisse précise
+        Gate::define('manage-parish', function (User $user, Parish $parish) {
+            if (in_array($user->role, ['admin', 'bishop'])) return true;
+
+            return in_array($user->role, ['priest', 'secretary']) 
+                && $user->parish_id === $parish->id;
         });
     }
 }

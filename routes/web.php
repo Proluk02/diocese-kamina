@@ -14,6 +14,7 @@ use App\Livewire\Admin\Parishes\ParishIndex;
 use App\Livewire\Admin\Users\UserIndex;
 use App\Livewire\Admin\Songs\SongIndex;
 use App\Livewire\Admin\Settings\SettingsIndex;
+use App\Livewire\Admin\Clergy\ClergyManager;
 
 // --- IMPORTS COMPOSANTS PUBLIC ---
 use App\Livewire\Public\Home;
@@ -27,6 +28,7 @@ use App\Livewire\Public\Parishes\ParishList;
 use App\Livewire\Public\Parishes\ParishDetail;
 use App\Livewire\Public\Liturgy\SongLibrary;
 use App\Livewire\Public\Donation;
+use App\Http\Controllers\DownloadController;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,6 +50,9 @@ Route::get('/paroisses', ParishList::class)->name('parishes.public.index');
 Route::get('/paroisses/{id}', ParishDetail::class)->name('parishes.public.show');
 Route::get('/liturgie', SongLibrary::class)->name('liturgy.public.index');
 Route::get('/don', Donation::class)->name('donation');
+Route::get('/download/song/{id}/{type}', [DownloadController::class, 'downloadSong'])
+    ->name('download.song')
+    ->where('type', 'audio|score');
 
 /*
 |--------------------------------------------------------------------------
@@ -78,6 +83,10 @@ Route::middleware(['auth', 'verified', EnsureUserIsActive::class])
     // Administration Système (À protéger via Gate dans le composant)
     Route::get('/users', UserIndex::class)->name('users.index');
     Route::get('/settings', SettingsIndex::class)->name('settings.index');
+
+    Route::get('/clergy', ClergyManager::class)
+        ->middleware('can:manage-clergy')
+        ->name('clergy.index');
 });
 
 /*
