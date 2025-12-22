@@ -25,7 +25,7 @@
                 <span class="bg-kamina-gold text-white px-4 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider mb-6 inline-block shadow-lg">
                     Paroisse de {{ $parish->city }}
                 </span>
-                <h1 class="text-5xl md:text-7xl font-bold text-white font-playfair leading-tight mb-6 drop-shadow-2xl">
+                <h1 class="text-5xl md:text-4xl font-bold text-white font-playfair leading-tight mb-6 drop-shadow-2xl">
                     {{ $parish->name }}
                 </h1>
                 <p class="text-xl text-gray-200 flex items-center gap-3 font-light">

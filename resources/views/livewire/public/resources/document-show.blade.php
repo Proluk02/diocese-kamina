@@ -1,7 +1,7 @@
 <div class="bg-white dark:bg-gray-900 min-h-screen pb-20 transition-colors duration-300">
     
     <!-- Header Simple & Élégant -->
-    <div class="bg-brand-light dark:bg-gray-800 py-16 border-b border-gray-100 dark:border-gray-700">
+    <div class="bg-brand-light dark:bg-gray-800 py-24 border-b border-gray-100 dark:border-gray-700">
         <div class="max-w-4xl mx-auto px-4 text-center">
             <a href="{{ route('documents.public.index') }}" class="inline-flex items-center text-gray-500 dark:text-gray-400 hover:text-kamina-blue dark:hover:text-blue-400 mb-8 transition-colors text-sm font-bold uppercase tracking-widest">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
