@@ -12,83 +12,93 @@
         </button>
     </div>
 
-    <!-- FILTRES -->
-    <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col md:flex-row gap-4">
-        <div class="relative w-full md:w-96">
-            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg></span>
-            <input wire:model.live.debounce.300ms="search" type="text" class="block w-full pl-10 pr-3 py-2.5 border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-kamina-gold focus:border-kamina-gold transition-colors" placeholder="Rechercher nom ou email...">
-        </div>
-        <select wire:model.live="roleFilter" class="block w-full md:w-64 py-2.5 border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-kamina-gold focus:border-kamina-gold transition-colors">
-            <option value="">Tous les rôles</option>
-            @foreach($roles as $key => $label) <option value="{{ $key }}">{{ $label }}</option> @endforeach
-        </select>
+    <!-- TABS -->
+    <div class="flex flex-wrap gap-2 border-b border-gray-200 dark:border-gray-700">
+        <button wire:click="setTab('all')" class="px-4 py-2 text-sm font-bold rounded-t-lg transition {{ $activeTab === 'all' ? 'bg-white dark:bg-gray-800 text-kamina-blue border-b-2 border-kamina-blue' : 'text-gray-500 hover:text-gray-700' }}">Tous</button>
+        <button wire:click="setTab('clergy')" class="px-4 py-2 text-sm font-bold rounded-t-lg transition {{ $activeTab === 'clergy' ? 'bg-white dark:bg-gray-800 text-kamina-blue border-b-2 border-kamina-blue' : 'text-gray-500 hover:text-gray-700' }}">Clergé & Staff</button>
+        <button wire:click="setTab('musicians')" class="px-4 py-2 text-sm font-bold rounded-t-lg transition {{ $activeTab === 'musicians' ? 'bg-white dark:bg-gray-800 text-kamina-blue border-b-2 border-kamina-blue' : 'text-gray-500 hover:text-gray-700' }}">Musiciens</button>
+        <button wire:click="setTab('pending')" class="px-4 py-2 text-sm font-bold rounded-t-lg transition flex items-center gap-2 {{ $activeTab === 'pending' ? 'bg-white dark:bg-gray-800 text-red-600 border-b-2 border-red-600' : 'text-gray-500 hover:text-red-500' }}">
+            En attente
+            @php $pendingCount = \App\Models\User::where('is_active', false)->count(); @endphp
+            @if($pendingCount > 0) <span class="bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">{{ $pendingCount }}</span> @endif
+        </button>
     </div>
 
     <!-- TABLEAU -->
-    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+    <div class="bg-white dark:bg-gray-800 rounded-b-2xl rounded-tr-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+        <div class="p-4 border-b border-gray-100 dark:border-gray-700">
+            <input wire:model.live.debounce.300ms="search" type="text" class="block w-full md:w-80 pl-4 pr-3 py-2 border-gray-200 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-900 text-sm focus:ring-kamina-gold" placeholder="Rechercher...">
+        </div>
         <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-                <thead class="bg-gray-50/50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 uppercase text-xs">
+            <table class="w-full text-left">
+                <thead class="bg-gray-50/50 dark:bg-gray-700/50 text-gray-500 uppercase text-xs">
                     <tr>
-                        <th class="py-4 px-6 font-semibold">Utilisateur</th>
-                        <th class="py-4 px-6 font-semibold">Rôle</th>
-                        <th class="py-4 px-6 font-semibold">Affectation (Paroisse)</th>
-                        <th class="py-4 px-6 text-center font-semibold">Date d'ajout</th>
-                        <th class="py-4 px-6 text-right font-semibold">Actions</th>
+                        <th class="px-6 py-4 font-semibold">Utilisateur</th>
+                        <th class="px-6 py-4 font-semibold">Rôle</th>
+                        <th class="px-6 py-4 font-semibold">Affectation</th>
+                        <th class="px-6 py-4 text-center font-semibold">État</th>
+                        <th class="px-6 py-4 text-right font-semibold">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
                     @forelse($users as $user)
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors duration-150">
-                        <td class="py-4 px-6">
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition">
+                        <td class="px-6 py-4">
                             <div class="flex items-center gap-3">
-                                <div class="h-10 w-10 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center text-gray-600 dark:text-gray-200 font-bold shadow-sm">
+                                <div class="h-10 w-10 rounded-full bg-kamina-blue text-white flex items-center justify-center font-bold">
                                     {{ substr($user->name, 0, 1) }}
                                 </div>
                                 <div>
-                                    <div class="font-semibold text-gray-900 dark:text-white">{{ $user->name }}</div>
+                                    <div class="font-bold text-gray-900 dark:text-white">{{ $user->name }}</div>
                                     <div class="text-xs text-gray-500">{{ $user->email }}</div>
                                 </div>
                             </div>
                         </td>
-                        <td class="py-4 px-6">
+                        <td class="px-6 py-4">
                             @php
                                 $badgeColor = match($user->role) {
-                                    'admin' => 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400',
-                                    'bishop' => 'bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-400',
-                                    'priest' => 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400',
-                                    'secretary' => 'bg-cyan-100 text-cyan-700 border-cyan-200 dark:bg-cyan-900/30 dark:text-cyan-400',
-                                    'musician' => 'bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-900/30 dark:text-orange-400',
-                                    default => 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-700 dark:text-gray-300'
+                                    'admin' => 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+                                    'bishop' => 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+                                    'priest' => 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+                                    'secretary' => 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400',
+                                    'musician' => 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
+                                    default => 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
                                 };
                             @endphp
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border {{ $badgeColor }}">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $badgeColor }}">
                                 {{ $roles[$user->role] ?? ucfirst($user->role) }}
                             </span>
                         </td>
-                        <td class="py-4 px-6 text-sm">
-                            @if($user->parish)
-                                <div class="flex items-center text-gray-700 dark:text-gray-300">
-                                    <svg class="w-4 h-4 mr-1.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-                                    {{ $user->parish->name }}
-                                </div>
+                        <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+                            {{ $user->parish->name ?? '-' }}
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            @if($user->is_active)
+                                <span class="text-green-600 text-xs font-bold bg-green-100 px-2 py-1 rounded-full">Actif</span>
                             @else
-                                <span class="text-gray-400 italic text-xs">-</span>
+                                <span class="text-red-600 text-xs font-bold bg-red-100 px-2 py-1 rounded-full animate-pulse">En attente</span>
                             @endif
                         </td>
-                        <td class="py-4 px-6 text-center text-sm text-gray-500">{{ $user->created_at->format('d/m/Y') }}</td>
-                        <td class="py-4 px-6 text-right">
-                            <div class="flex items-center justify-end gap-2">
-                                <button wire:click="edit({{ $user->id }})" class="p-2 text-gray-400 hover:text-kamina-gold hover:bg-yellow-50 dark:hover:bg-yellow-900/20 rounded-lg transition"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button>
-                                
-                                @if($user->id !== auth()->id())
-                                <button wire:click="delete({{ $user->id }})" wire:confirm="Supprimer cet utilisateur ?" class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>
-                                @endif
-                            </div>
+                        <td class="px-6 py-4 text-right flex justify-end gap-2">
+                            <!-- Toggle Status -->
+                            @if($user->id !== auth()->id())
+                                <button wire:click="toggleStatus({{ $user->id }})" class="p-2 rounded-lg transition {{ $user->is_active ? 'text-orange-500 hover:bg-orange-50' : 'text-green-600 hover:bg-green-50 bg-green-50' }}" title="{{ $user->is_active ? 'Désactiver' : 'Valider le compte' }}">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        @if($user->is_active) <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                                        @else <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /> @endif
+                                    </svg>
+                                </button>
+                            @endif
+
+                            <button wire:click="edit({{ $user->id }})" class="p-2 text-gray-400 hover:text-kamina-gold"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button>
+                            
+                            @if($user->id !== auth()->id())
+                                <button wire:click="delete({{ $user->id }})" wire:confirm="Supprimer ce compte ?" class="p-2 text-gray-400 hover:text-red-500"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>
+                            @endif
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="5" class="py-8 text-center text-gray-500">Aucun utilisateur trouvé.</td></tr>
+                    <tr><td colspan="5" class="p-8 text-center text-gray-500">Aucun utilisateur trouvé.</td></tr>
                     @endforelse
                 </tbody>
             </table>
@@ -96,7 +106,7 @@
         <div class="px-6 py-4 bg-gray-50 dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700">{{ $users->links() }}</div>
     </div>
 
-    <!-- MODALE UNIQUE (Z-Index 999) -->
+    <!-- MODALE -->
     @if($isOpen)
     <div class="fixed inset-0 z-[999] overflow-y-auto">
         <div class="fixed inset-0 bg-gray-900/75 backdrop-blur-sm transition-opacity"></div>
@@ -145,7 +155,6 @@
                     </div>
 
                     <!-- Paroisse (Conditionnel) -->
-                    <!-- S'affiche seulement si le rôle est 'priest' ou 'secretary' -->
                     @if(in_array($role, ['priest', 'secretary']))
                     <div class="animate-fadeIn p-4 bg-blue-50 dark:bg-blue-900/10 rounded-lg border border-blue-100 dark:border-blue-800">
                         <label class="block text-sm font-semibold text-blue-800 dark:text-blue-300 mb-1">Paroisse d'affectation</label>
