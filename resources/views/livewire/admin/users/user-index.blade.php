@@ -45,8 +45,13 @@
                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition">
                         <td class="px-6 py-4">
                             <div class="flex items-center gap-3">
-                                <div class="h-10 w-10 rounded-full bg-kamina-blue text-white flex items-center justify-center font-bold">
-                                    {{ substr($user->name, 0, 1) }}
+                                <!-- AVATAR -->
+                                <div class="h-10 w-10 rounded-full overflow-hidden flex-shrink-0 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                                    @if($user->profile_photo_path)
+                                        <img src="{{ asset('storage/'.$user->profile_photo_path) }}" class="h-full w-full object-cover">
+                                    @else
+                                        <span class="text-gray-500 font-bold text-sm">{{ substr($user->name, 0, 1) }}</span>
+                                    @endif
                                 </div>
                                 <div>
                                     <div class="font-bold text-gray-900 dark:text-white">{{ $user->name }}</div>
@@ -65,7 +70,7 @@
                                     default => 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
                                 };
                             @endphp
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $badgeColor }}">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border {{ $badgeColor }}">
                                 {{ $roles[$user->role] ?? ucfirst($user->role) }}
                             </span>
                         </td>
@@ -80,7 +85,6 @@
                             @endif
                         </td>
                         <td class="px-6 py-4 text-right flex justify-end gap-2">
-                            <!-- Toggle Status -->
                             @if($user->id !== auth()->id())
                                 <button wire:click="toggleStatus({{ $user->id }})" class="p-2 rounded-lg transition {{ $user->is_active ? 'text-orange-500 hover:bg-orange-50' : 'text-green-600 hover:bg-green-50 bg-green-50' }}" title="{{ $user->is_active ? 'Désactiver' : 'Valider le compte' }}">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -114,8 +118,7 @@
             <div class="relative transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 text-left shadow-2xl transition-all sm:w-full sm:max-w-lg border border-gray-100 dark:border-gray-700">
                 
                 <div class="bg-white dark:bg-gray-800 px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                        <svg class="w-5 h-5 text-kamina-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white">
                         {{ $mode === 'edit' ? 'Modifier Utilisateur' : 'Nouvel Utilisateur' }}
                     </h3>
                     <button wire:click="closeModal" class="text-gray-400 hover:text-gray-500 p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
@@ -123,6 +126,24 @@
 
                 <div class="px-6 py-6 space-y-5">
                     
+                    <!-- Avatar Upload -->
+                    <div class="flex items-center gap-4">
+                        @if ($photo)
+                            <img src="{{ $photo->temporaryUrl() }}" class="h-16 w-16 rounded-full object-cover border-2 border-gray-200">
+                        @elseif ($oldPhoto)
+                            <img src="{{ asset('storage/'.$oldPhoto) }}" class="h-16 w-16 rounded-full object-cover border-2 border-gray-200">
+                        @else
+                            <div class="h-16 w-16 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 text-xl font-bold border-2 border-dashed border-gray-300">
+                                ?
+                            </div>
+                        @endif
+                        
+                        <label class="cursor-pointer bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 shadow-sm hover:bg-gray-50">
+                            Choisir une photo
+                            <input type="file" wire:model="photo" class="hidden" accept="image/*">
+                        </label>
+                    </div>
+
                     <!-- Nom -->
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Nom Complet</label>
@@ -164,7 +185,6 @@
                                 <option value="{{ $parish->id }}">{{ $parish->name }} ({{ $parish->city }})</option>
                             @endforeach
                         </select>
-                        <p class="text-xs text-blue-600 dark:text-blue-400 mt-1">Obligatoire pour lier les publications à la paroisse.</p>
                     </div>
                     @endif
 

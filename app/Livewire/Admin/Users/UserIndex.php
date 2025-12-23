@@ -6,23 +6,24 @@ use App\Models\User;
 use App\Models\Parish;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\WithFileUploads; // Import obligatoire
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage; // Import obligatoire
 
 class UserIndex extends Component
 {
-    use WithPagination;
+    use WithPagination, WithFileUploads;
 
     // Filtres
     public $search = '';
-    public $activeTab = 'all'; // all, clergy, musicians, pending
+    public $activeTab = 'all';
     
     // Modale
     public $isOpen = false;
     public $mode = 'create';
 
-    // Champs Formulaire
+    // Champs
     public $userId;
     public $name;
     public $email;
@@ -31,14 +32,17 @@ class UserIndex extends Component
     public $parish_id; 
     public $phone;
     public $is_active = true;
+    
+    // Photo
+    public $photo;      // Fichier temporaire
+    public $oldPhoto;   // Chemin bdd
 
-    // Listes
     public $roles = [
         'admin' => 'Administrateur',
         'bishop' => 'Évêque / Chancelier',
-        'priest' => 'Prêtre (Curé/Vicaire)',
-        'secretary' => 'Secrétaire Paroissial',
-        'musician' => 'Musicien / Chorale',
+        'priest' => 'Prêtre',
+        'secretary' => 'Secrétaire',
+        'musician' => 'Musicien',
         'user' => 'Fidèle'
     ];
 
@@ -51,6 +55,7 @@ class UserIndex extends Component
             'parish_id' => 'nullable|exists:parishes,id',
             'phone' => 'nullable|string',
             'is_active' => 'boolean',
+            'photo' => 'nullable|image|max:2048', // Max 2MB
         ];
 
         if ($this->mode === 'create') {
@@ -63,24 +68,7 @@ class UserIndex extends Component
     }
 
     public function updatedSearch() { $this->resetPage(); }
-
-    public function setTab($tab)
-    {
-        $this->activeTab = $tab;
-        $this->resetPage();
-    }
-
-    public function toggleStatus($id)
-    {
-        if ($id === auth()->id()) return; // Protection
-        
-        $user = User::findOrFail($id);
-        $user->is_active = !$user->is_active;
-        $user->save();
-
-        $status = $user->is_active ? 'activé' : 'désactivé';
-        session()->flash('success', "Compte de {$user->name} {$status}.");
-    }
+    public function setTab($tab) { $this->activeTab = $tab; $this->resetPage(); }
 
     public function create()
     {
@@ -99,6 +87,7 @@ class UserIndex extends Component
         $this->parish_id = $user->parish_id;
         $this->phone = $user->phone;
         $this->is_active = (bool) $user->is_active;
+        $this->oldPhoto = $user->profile_photo_path; // On charge l'ancienne photo
         $this->password = ''; 
         
         $this->mode = 'edit';
@@ -113,7 +102,6 @@ class UserIndex extends Component
             'name' => $this->name,
             'email' => $this->email,
             'role' => $this->role,
-            // On nettoie le parish_id si le rôle n'est pas clergé
             'parish_id' => in_array($this->role, ['priest', 'secretary']) ? $this->parish_id : null,
             'phone' => $this->phone,
             'is_active' => $this->is_active,
@@ -122,6 +110,17 @@ class UserIndex extends Component
         if (!empty($this->password)) {
             $data['password'] = Hash::make($this->password);
         }
+
+        // --- GESTION PHOTO (C'est ici que ça se joue) ---
+        if ($this->photo) {
+            // 1. Si on modifie, on supprime l'ancienne
+            if ($this->mode === 'edit' && $this->oldPhoto) {
+                Storage::disk('public')->delete($this->oldPhoto);
+            }
+            // 2. On stocke la nouvelle et on récupère le chemin
+            $data['profile_photo_path'] = $this->photo->store('profile-photos', 'public');
+        }
+        // ------------------------------------------------
 
         if ($this->mode === 'edit') {
             User::find($this->userId)->update($data);
@@ -137,8 +136,25 @@ class UserIndex extends Component
     public function delete($id)
     {
         if ($id === auth()->id()) return;
-        User::find($id)->delete();
+        
+        $user = User::find($id);
+        if ($user->profile_photo_path) {
+            Storage::disk('public')->delete($user->profile_photo_path);
+        }
+        $user->delete();
+        
         session()->flash('success', 'Utilisateur supprimé.');
+    }
+
+    public function toggleStatus($id)
+    {
+        if ($id === auth()->id()) return;
+        $user = User::findOrFail($id);
+        $user->is_active = !$user->is_active;
+        $user->save();
+        
+        $status = $user->is_active ? 'activé' : 'désactivé';
+        session()->flash('success', "Compte {$status}.");
     }
 
     public function closeModal()
@@ -149,7 +165,7 @@ class UserIndex extends Component
 
     private function resetInputFields()
     {
-        $this->reset(['name', 'email', 'password', 'role', 'parish_id', 'phone', 'userId']);
+        $this->reset(['name', 'email', 'password', 'role', 'parish_id', 'phone', 'userId', 'photo', 'oldPhoto']);
         $this->role = 'user';
         $this->is_active = true;
         $this->resetErrorBag();
@@ -163,18 +179,12 @@ class UserIndex extends Component
                   ->orWhere('email', 'like', '%'.$this->search.'%');
             });
 
-        // Filtrage par onglet
-        switch ($this->activeTab) {
-            case 'clergy':
-                $query->whereIn('role', ['bishop', 'priest', 'secretary']);
-                break;
-            case 'musicians':
-                $query->where('role', 'musician');
-                break;
-            case 'pending':
-                $query->where('is_active', false);
-                break;
-        }
+        match ($this->activeTab) {
+            'clergy' => $query->whereIn('role', ['bishop', 'priest', 'secretary']),
+            'musicians' => $query->where('role', 'musician'),
+            'pending' => $query->where('is_active', false),
+            default => null,
+        };
 
         return view('livewire.admin.users.user-index', [
             'users' => $query->latest()->paginate(10),

@@ -1,8 +1,4 @@
 <div class="overflow-x-hidden bg-brand-light dark:bg-gray-900 transition-colors duration-300">
-    
-    <!-- ========================================================= -->
-    <!-- 1. HERO CARROUSEL (PLEIN ÉCRAN) -->
-    <!-- ========================================================= -->
     <div class="relative min-h-screen flex items-center justify-center overflow-hidden bg-gray-900" 
          x-data="{ 
             activeSlide: 0, 
@@ -50,20 +46,21 @@
                 PORTAIL OFFICIEL
             </div>
 
-            <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold font-playfair text-white mb-8 leading-tight drop-shadow-2xl tracking-tight">
+            <!-- TITRE AJUSTÉ -->
+            <h1 class="text-4xl md:text-6xl lg:text-7xl font-bold font-playfair text-white mb-6 leading-tight drop-shadow-2xl tracking-tight">
                 Diocèse de Kamina <br>
                 <span class="text-transparent bg-clip-text bg-gradient-to-r from-kamina-gold via-yellow-200 to-kamina-gold italic">Terre d'Espérance</span>
             </h1>
 
-            <p class="text-lg md:text-2xl text-gray-200 max-w-3xl mx-auto mb-12 font-light drop-shadow-md leading-relaxed">
+            <p class="text-lg md:text-xl text-gray-200 max-w-3xl mx-auto mb-10 font-light drop-shadow-md leading-relaxed">
                 Une Église famille, unie dans la prière, engagée dans la charité et tournée vers l'avenir de notre communauté.
             </p>
 
             <div class="flex flex-col sm:flex-row justify-center gap-6">
-                <a href="{{ route('news.index') }}" class="px-10 py-4 bg-kamina-gold hover:bg-yellow-600 text-white font-bold text-lg rounded-full transition-all shadow-lg shadow-yellow-500/30 transform hover:-translate-y-1 hover:shadow-xl hover:scale-105">
+                <a href="{{ route('news.index') }}" class="px-8 py-3.5 bg-kamina-gold hover:bg-yellow-600 text-white font-bold text-lg rounded-full transition-all shadow-lg shadow-yellow-500/30 transform hover:-translate-y-1 hover:shadow-xl hover:scale-105">
                     Suivre l'actualité
                 </a>
-                <a href="{{ route('parishes.public.index') }}" class="px-10 py-4 bg-white/10 backdrop-blur-md border border-white/50 text-white font-bold text-lg rounded-full hover:bg-white hover:text-kamina-blue transition-all transform hover:-translate-y-1">
+                <a href="{{ route('parishes.public.index') }}" class="px-8 py-3.5 bg-white/10 backdrop-blur-md border border-white/50 text-white font-bold text-lg rounded-full hover:bg-white hover:text-kamina-blue transition-all transform hover:-translate-y-1">
                     Trouver une paroisse
                 </a>
             </div>
@@ -87,7 +84,7 @@
     </div>
 
     <!-- ========================================================= -->
-    <!-- 2. MOT DE L'ÉVÊQUE (MODERNISÉ) -->
+    <!-- 2. MOT DE L'ÉVÊQUE (MODERNISÉ & DYNAMIQUE) -->
     <!-- ========================================================= -->
     <section class="py-24 bg-brand-surface dark:bg-gray-800 transition-colors duration-300 relative">
         <!-- Pattern décoratif -->
@@ -101,13 +98,22 @@
                         <!-- Cadre décoratif -->
                         <div class="absolute -top-4 -left-4 w-full h-full border-2 border-kamina-gold rounded-3xl z-0"></div>
                         <div class="relative rounded-3xl overflow-hidden shadow-2xl z-10 aspect-[3/4]">
-                            <img src="{{ asset('storage/img/img1.jpg') }}" 
-                                 alt="Mgr l'Évêque" 
-                                 class="w-full h-full object-cover transform transition duration-700 hover:scale-105">
+                            
+                            <!-- PHOTO DYNAMIQUE (Depuis l'Admin) -->
+                            @if(!empty($S['bishop_photo_path']))
+                                <img src="{{ asset('storage/' . $S['bishop_photo_path']) }}" 
+                                     alt="Mgr l'Évêque" 
+                                     class="w-full h-full object-cover transform transition duration-700 hover:scale-105">
+                            @else
+                                <!-- Image par défaut si pas uploadée -->
+                                <img src="{{ asset('storage/img/img2.jpg') }}" 
+                                     alt="Mgr l'Évêque" 
+                                     class="w-full h-full object-cover transform transition duration-700 hover:scale-105">
+                            @endif
                             
                             <!-- Cartouche Nom -->
                             <div class="absolute bottom-6 left-6 right-6 bg-white/95 dark:bg-gray-900/95 backdrop-blur rounded-xl p-4 shadow-lg text-center border-l-4 border-kamina-gold">
-                                <h3 class="text-gray-900 dark:text-white font-bold text-xl font-playfair">Mgr Léonard KAKUDJI</h3>
+                                <h3 class="text-gray-900 dark:text-white font-bold text-xl font-playfair">{{ $S['bishop_name'] ?? 'Mgr Léonard KAKUDJI' }}</h3>
                                 <p class="text-kamina-blue dark:text-blue-400 text-xs font-bold tracking-widest uppercase mt-1">Évêque de Kamina</p>
                             </div>
                         </div>
@@ -119,13 +125,13 @@
                         <span class="w-2 h-2 rounded-full bg-kamina-gold"></span> Le Pasteur
                     </div>
                     
-                    <h2 class="text-4xl md:text-6xl font-bold font-playfair text-gray-900 dark:text-white mb-8 leading-tight">
+                    <h2 class="text-4xl md:text-5xl font-bold font-playfair text-gray-900 dark:text-white mb-8 leading-tight">
                         Bienvenue <br> <span class="text-kamina-blue dark:text-blue-400">chez Vous</span>
                     </h2>
                     
                     <div class="relative mb-10 pl-8">
                         <svg class="absolute -top-4 -left-4 w-12 h-12 text-gray-100 dark:text-gray-700 transform -scale-x-100 -z-10" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21L14.017 18C14.017 16.0547 15.3789 13.9141 17.6172 12.375C15.3359 11.8359 14.017 10.4375 14.017 8.36719C14.017 5.70312 16.2734 3.79688 18.5781 3.79688C20.9297 3.79688 23.0781 5.60156 23.0781 9.07031C23.0781 14.3047 18.7344 21 14.017 21ZM5.39062 21L5.39062 18C5.39062 16.0547 6.75781 13.9141 8.98438 12.375C6.70312 11.8359 5.39062 10.4375 5.39062 8.36719C5.39062 5.70312 7.64062 3.79688 9.94531 3.79688C12.2969 3.79688 14.4453 5.60156 14.4453 9.07031C14.4453 14.3047 10.1016 21 5.39062 21Z"/></svg>
-                        <blockquote class="text-2xl text-slate-700 dark:text-gray-200 italic font-serif leading-relaxed">
+                        <blockquote class="text-xl md:text-2xl text-slate-700 dark:text-gray-200 italic font-serif leading-relaxed">
                             "Chers frères et sœurs, que ce site soit un pont entre nos paroisses et le monde. Bâtissons ensemble une communauté fondée sur l'amour."
                         </blockquote>
                     </div>
@@ -151,7 +157,7 @@
             <div class="flex flex-col md:flex-row justify-between items-end mb-16" data-aos="fade-up">
                 <div>
                     <span class="text-kamina-blue dark:text-blue-400 font-bold uppercase tracking-wider text-sm mb-2 block">Blog & Événements</span>
-                    <h2 class="text-4xl font-bold font-playfair text-gray-900 dark:text-white">À la Une</h2>
+                    <h2 class="text-3xl md:text-4xl font-bold font-playfair text-gray-900 dark:text-white">À la Une</h2>
                 </div>
                 <a href="{{ route('news.index') }}" class="hidden md:flex items-center gap-2 px-6 py-2.5 rounded-full border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 font-medium hover:border-kamina-blue hover:text-kamina-blue dark:hover:text-white hover:bg-white dark:hover:bg-gray-800 transition shadow-sm">
                     Toutes les actualités
@@ -249,7 +255,7 @@
                     Accès Rapide
                     <div class="h-px w-8 bg-blue-400"></div>
                 </div>
-                <h2 class="text-4xl md:text-5xl font-bold font-playfair text-white mb-6">
+                <h2 class="text-3xl md:text-5xl font-bold font-playfair text-white mb-6">
                     Explorez la <span class="text-transparent bg-clip-text bg-gradient-to-r from-kamina-gold to-yellow-300">Vie du Diocèse</span>
                 </h2>
                 <p class="text-blue-100 text-lg max-w-2xl mx-auto">

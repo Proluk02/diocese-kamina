@@ -4,6 +4,7 @@ namespace App\Livewire\Public\News;
 
 use Livewire\Component;
 use App\Models\Post;
+use Illuminate\Support\Str; // Importation nécessaire pour Str::limit
 
 class ArticleShow extends Component
 {
@@ -24,7 +25,8 @@ class ArticleShow extends Component
                                   ->where('status', 'published')
                                   ->take(3)
                                   ->get()
-        ])->layout('layouts.guest')
+        ])
+        ->layout('layouts.guest')
         ->title($this->post->title)
         ->layoutData(['description' => Str::limit(strip_tags($this->post->body), 150)]); 
     }

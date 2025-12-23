@@ -67,7 +67,7 @@
                     <div class="w-full md:w-1/3 flex justify-center">
                         <div class="relative">
                             <div class="absolute inset-0 bg-gradient-to-br from-kamina-blue to-kamina-gold rounded-full blur animate-pulse"></div>
-                            <img src="{{ asset('storage/img/img1.jpg') }}" 
+                            <img src="{{ asset('storage/img/img2.jpg') }}" 
                                  alt="Mgr l'Évêque" 
                                  class="relative w-64 h-64 rounded-full object-cover border-4 border-white dark:border-gray-800 shadow-2xl">
                         </div>

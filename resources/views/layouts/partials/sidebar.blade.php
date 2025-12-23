@@ -1,13 +1,13 @@
 <div class="flex h-full flex-col justify-between text-white">
     <!-- HEADER SIDEBAR -->
     <div class="flex items-center justify-between px-4 py-5 border-b border-gray-800/50">
-        <a href="{{ route('dashboard') }}" class="flex items-center gap-3">
+        <a href="{{ route('home') }}" class="flex items-center gap-3">
             <div class="relative flex-shrink-0">
                 <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-kamina-gold to-yellow-600 flex items-center justify-center text-brand-dark font-bold shadow-lg">DK</div>
             </div>
             <div class="flex flex-col overflow-hidden transition-all duration-300" x-show="sidebarExpanded">
                 <span class="text-white text-lg font-bold tracking-wider whitespace-nowrap">KAMINA</span>
-                <span class="text-xs text-gray-400 whitespace-nowrap">Administration</span>
+                <span class="text-xs text-gray-400 whitespace-nowrap">Accueil</span>
             </div>
         </a>
         <button @click="sidebarExpanded = !sidebarExpanded" class="hidden lg:block text-gray-400 hover:text-white transition">

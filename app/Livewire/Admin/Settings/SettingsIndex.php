@@ -18,13 +18,17 @@ class SettingsIndex extends Component
     public $facebook_url;
     public $youtube_url;
 
-    // Présentation (Nouveau)
+    // Présentation
     public $history_text;
     public $mission_text;
     public $bishop_name;
     public $bishop_bio;
+    
+    // Photo de l'Évêque (Nouveau)
+    public $bishop_photo;      // Fichier temporaire (Upload)
+    public $old_bishop_photo;  // Chemin existant en BDD
 
-    // Gestion du Carrousel
+    // Carrousel
     public $slides = []; 
     public $newSlide;    
 
@@ -39,21 +43,20 @@ class SettingsIndex extends Component
         $this->facebook_url = $settings['facebook_url'] ?? '';
         $this->youtube_url = $settings['youtube_url'] ?? '';
         
-        // Contenu Présentation
         $this->history_text = $settings['history_text'] ?? '';
         $this->mission_text = $settings['mission_text'] ?? '';
         $this->bishop_name = $settings['bishop_name'] ?? 'Mgr Léonard KAKUDJI';
         $this->bishop_bio = $settings['bishop_bio'] ?? '';
+        
+        // Charger la photo existante
+        $this->old_bishop_photo = $settings['bishop_photo_path'] ?? null;
 
         $this->slides = json_decode($settings['home_slides'] ?? '[]', true);
     }
 
     public function addSlide()
     {
-        $this->validate([
-            'newSlide' => 'image|max:2048', 
-        ]);
-
+        $this->validate(['newSlide' => 'image|max:2048']);
         $path = $this->newSlide->store('slides', 'public');
         $this->slides[] = $path;
         Setting::updateOrCreate(['key' => 'home_slides'], ['value' => json_encode($this->slides)]);
@@ -76,6 +79,7 @@ class SettingsIndex extends Component
         $this->validate([
             'site_name' => 'required|string|max:255',
             'contact_email' => 'required|email',
+            'bishop_photo' => 'nullable|image|max:2048', // Validation photo
         ]);
 
         $data = [
@@ -91,9 +95,24 @@ class SettingsIndex extends Component
             'bishop_bio' => $this->bishop_bio,
         ];
 
+        // Gestion Photo Évêque
+        if ($this->bishop_photo) {
+            // Supprimer l'ancienne
+            if ($this->old_bishop_photo) {
+                Storage::disk('public')->delete($this->old_bishop_photo);
+            }
+            // Sauvegarder la nouvelle
+            $data['bishop_photo_path'] = $this->bishop_photo->store('bishop', 'public');
+            // Mettre à jour la vue en direct
+            $this->old_bishop_photo = $data['bishop_photo_path'];
+        }
+
         foreach ($data as $key => $value) {
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
         }
+
+        // Reset l'input file
+        $this->bishop_photo = null;
 
         session()->flash('success', 'Paramètres généraux mis à jour.');
     }
