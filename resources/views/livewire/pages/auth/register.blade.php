@@ -25,21 +25,18 @@ new #[Layout('layouts.guest')] class extends Component
             'role' => ['required', 'in:user,musician'],
         ]);
 
-        $userData = [
+        $user = User::create([
             'name' => $this->name,
             'email' => $this->email,
             'password' => Hash::make($this->password),
             'role' => $this->role,
-            // Musicien = Inactif par défaut
-            'is_active' => $this->role === 'user' ? true : false,
-        ];
-
-        $user = User::create($userData);
+            'is_active' => $this->role === 'user',
+        ]);
 
         event(new Registered($user));
 
         if ($this->role === 'musician') {
-            session()->flash('status', 'Compte créé ! Veuillez attendre la validation de l\'administrateur pour accéder à l\'espace Musiciens.');
+            session()->flash('status', 'Validation requise par l\'administrateur.');
             $this->redirect(route('login'), navigate: true);
         } else {
             Auth::login($user);
@@ -48,79 +45,82 @@ new #[Layout('layouts.guest')] class extends Component
     }
 }; ?>
 
-<div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-brand-light dark:bg-gray-900 transition-colors duration-300">
-    
-    <div class="w-full sm:max-w-md mt-6 px-6 py-8 bg-white dark:bg-gray-800 shadow-2xl rounded-[2rem] border-t-4 border-kamina-gold overflow-hidden relative">
+<div class="min-h-screen flex flex-col justify-center items-center px-4 bg-slate-50 dark:bg-gray-950 transition-colors duration-500 py-16">
+    <div class="w-full max-w-[450px]">
         
-        <!-- Décoration -->
-        <div class="absolute top-0 left-0 -mt-10 -ml-10 w-32 h-32 bg-kamina-gold/10 rounded-full blur-2xl"></div>
-
-        <!-- En-tête -->
-        <div class="text-center mb-8 relative z-10">
-            <x-application-logo class="w-20 h-20 fill-current text-gray-500 mx-auto" />
-            <h2 class="mt-4 text-2xl font-bold text-gray-900 dark:text-white font-playfair">Créer un compte</h2>
-            <p class="text-sm text-gray-500 dark:text-gray-400">Rejoignez la communauté numérique du diocèse.</p>
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-black text-slate-900 dark:text-white font-playfair tracking-tight mb-2">Rejoignez-nous</h1>
+            <p class="text-sm text-slate-500 dark:text-gray-400 font-medium uppercase tracking-widest">Création de compte membre</p>
         </div>
 
-        <form wire:submit="register">
-            <!-- Name -->
-            <div>
-                <label for="name" class="block font-medium text-sm text-gray-700 dark:text-gray-300">Nom Complet</label>
-                <input wire:model="name" id="name" class="block mt-1 w-full rounded-xl border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:border-kamina-blue focus:ring-kamina-blue shadow-sm p-3" type="text" name="name" required autofocus autocomplete="name" />
-                <x-input-error :messages="$errors->get('name')" class="mt-2" />
-            </div>
+        <div class="bg-white dark:bg-gray-900 shadow-xl rounded-[2.5rem] p-8 md:p-10 border border-slate-100 dark:border-gray-800" x-data="{ show: false }">
+            
+            <form wire:submit="register" class="space-y-5">
+                <!-- Nom -->
+                <div>
+                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-gray-400 mb-1.5 ml-1">Nom Complet</label>
+                    <input wire:model="name" type="text" placeholder="Jean Dupont"
+                        class="w-full rounded-2xl border-slate-200 dark:border-gray-700 bg-slate-50/50 dark:bg-gray-800 text-sm p-3.5 focus:ring-2 focus:ring-kamina-blue/20 focus:border-kamina-blue transition-all dark:text-white" required autofocus />
+                    <x-input-error :messages="$errors->get('name')" class="mt-1" />
+                </div>
 
-            <!-- Email Address -->
-            <div class="mt-4">
-                <label for="email" class="block font-medium text-sm text-gray-700 dark:text-gray-300">Adresse Email</label>
-                <input wire:model="email" id="email" class="block mt-1 w-full rounded-xl border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:border-kamina-blue focus:ring-kamina-blue shadow-sm p-3" type="email" name="email" required autocomplete="username" />
-                <x-input-error :messages="$errors->get('email')" class="mt-2" />
-            </div>
+                <!-- Email -->
+                <div>
+                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-gray-400 mb-1.5 ml-1">Email</label>
+                    <input wire:model="email" type="email" placeholder="nom@exemple.com"
+                        class="w-full rounded-2xl border-slate-200 dark:border-gray-700 bg-slate-50/50 dark:bg-gray-800 text-sm p-3.5 focus:ring-2 focus:ring-kamina-blue/20 focus:border-kamina-blue transition-all dark:text-white" required />
+                    <x-input-error :messages="$errors->get('email')" class="mt-1" />
+                </div>
 
-            <!-- Type de Compte -->
-            <div class="mt-4">
-                <label for="role" class="block font-medium text-sm text-gray-700 dark:text-gray-300">Type de compte</label>
-                <select wire:model.live="role" id="role" class="block mt-1 w-full rounded-xl border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:border-kamina-blue focus:ring-kamina-blue shadow-sm p-3">
-                    <option value="user">Fidèle (Accès simple)</option>
-                    <option value="musician">Musicien / Chorale (Validation requise)</option>
-                </select>
-                
+                <!-- Type de Compte -->
+                <div>
+                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-gray-400 mb-1.5 ml-1">Je suis un...</label>
+                    <select wire:model.live="role" 
+                        class="w-full rounded-2xl border-slate-200 dark:border-gray-700 bg-slate-50/50 dark:bg-gray-800 text-sm p-3.5 focus:ring-2 focus:ring-kamina-blue/20 focus:border-kamina-blue transition-all font-bold dark:text-white">
+                        <option value="user">Fidèle du Diocèse</option>
+                        <option value="musician">Musicien / Choriste</option>
+                    </select>
+                </div>
+
                 @if($role === 'musician')
-                    <p class="text-xs text-yellow-600 dark:text-yellow-400 mt-2 bg-yellow-50 dark:bg-yellow-900/20 p-2 rounded-lg border border-yellow-100 dark:border-yellow-800">
-                        ⚠️ Les comptes musiciens doivent être approuvés par le service communication avant activation.
+                <div x-transition class="p-4 rounded-2xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800">
+                    <p class="text-[10px] font-bold text-blue-700 dark:text-blue-300 leading-relaxed uppercase">
+                        ℹ️ Les comptes musiciens sont vérifiés par l'administration avant d'accéder aux partitions.
                     </p>
+                </div>
                 @endif
+
+                <!-- Mots de passe -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-gray-400 mb-1.5 ml-1">Mot de passe</label>
+                        <input wire:model="password" :type="show ? 'text' : 'password'"
+                            class="w-full rounded-2xl border-slate-200 dark:border-gray-700 bg-slate-50/50 dark:bg-gray-800 text-sm p-3.5 focus:ring-2 focus:ring-kamina-blue/20 focus:border-kamina-blue transition-all dark:text-white" required />
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-gray-400 mb-1.5 ml-1">Confirmation</label>
+                        <input wire:model="password_confirmation" :type="show ? 'text' : 'password'"
+                            class="w-full rounded-2xl border-slate-200 dark:border-gray-700 bg-slate-50/50 dark:bg-gray-800 text-sm p-3.5 focus:ring-2 focus:ring-kamina-blue/20 focus:border-kamina-blue transition-all dark:text-white" required />
+                    </div>
+                </div>
+                <x-input-error :messages="$errors->get('password')" class="mt-1" />
+
+                <div class="flex items-center ml-1">
+                    <input type="checkbox" @click="show = !show" class="rounded border-slate-300 text-kamina-blue focus:ring-kamina-blue/20" id="v_pass">
+                    <label for="v_pass" class="ml-2 text-xs font-bold text-slate-500 dark:text-gray-400 cursor-pointer uppercase">Afficher les mots de passe</label>
+                </div>
+
+                <button type="submit" class="w-full py-4 bg-kamina-blue hover:bg-blue-800 text-white rounded-2xl font-black text-sm shadow-xl shadow-blue-500/20 transition-all hover:-translate-y-1 active:scale-95 uppercase tracking-widest">
+                    S'inscrire maintenant
+                </button>
+            </form>
+
+            <div class="mt-10 pt-6 border-t border-slate-50 dark:border-gray-800 text-center">
+                <a href="{{ route('login') }}" wire:navigate class="text-xs font-black text-kamina-gold hover:text-amber-600 transition-colors uppercase tracking-widest">
+                    Déjà inscrit ? Se connecter
+                </a>
             </div>
-
-            <!-- Password -->
-            <div class="mt-4">
-                <label for="password" class="block font-medium text-sm text-gray-700 dark:text-gray-300">Mot de passe</label>
-                <input wire:model="password" id="password" class="block mt-1 w-full rounded-xl border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:border-kamina-blue focus:ring-kamina-blue shadow-sm p-3" type="password" name="password" required autocomplete="new-password" />
-                <x-input-error :messages="$errors->get('password')" class="mt-2" />
-            </div>
-
-            <!-- Confirm Password -->
-            <div class="mt-4">
-                <label for="password_confirmation" class="block font-medium text-sm text-gray-700 dark:text-gray-300">Confirmer le mot de passe</label>
-                <input wire:model="password_confirmation" id="password_confirmation" class="block mt-1 w-full rounded-xl border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:border-kamina-blue focus:ring-kamina-blue shadow-sm p-3" type="password" name="password_confirmation" required autocomplete="new-password" />
-                <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-            </div>
-
-            <button type="submit" class="mt-6 w-full inline-flex justify-center items-center px-4 py-3 bg-kamina-blue border border-transparent rounded-xl font-bold text-sm text-white uppercase tracking-widest hover:bg-blue-800 focus:bg-blue-800 active:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-kamina-gold focus:ring-offset-2 transition ease-in-out duration-150 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transform">
-                {{ __('S\'inscrire') }}
-            </button>
-        </form>
-
-        <!-- Lien vers Connexion -->
-        <div class="mt-6 pt-6 border-t border-gray-100 dark:border-gray-700 text-center">
-            <p class="text-sm text-gray-500 dark:text-gray-400">Déjà inscrit ?</p>
-            <a href="{{ route('login') }}" wire:navigate class="text-sm font-bold text-kamina-gold hover:underline mt-1 inline-block">
-                Se connecter
-            </a>
         </div>
-    </div>
-    
-    <div class="mt-8 text-center text-xs text-gray-400 dark:text-gray-600">
-        &copy; {{ date('Y') }} Diocèse de Kamina.
     </div>
 </div>
